@@ -1,0 +1,996 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>docker常用命令</title>
+    <url>/undefined/d73d9aa0/</url>
+    <content><![CDATA[<p>1.docker或docker-help#查看docker自带的帮助信息  </p>
+<p>启动类命令  </p>
+<p>systemctl start docker              # 启动dockerQ  </p>
+<p>systemctl stop docker              # 停l止docker  </p>
+<p>systemctl restart docker           # 重启docker  </p>
+<p>systemctl status docker           # 查看docker状态  </p>
+<p>systemctl enable docker           # 将dockeri设为开机自启动  </p>
+<p>docker info                            # 查看docker的各种信息，包括版本信息、镜像和容器数量等  </p>
+<p>docker version                       # 查看docker版本Q信息  </p>
+<p>docker images                       # 查看本地主机上已有的镜像</p>
+<h2 id="一、管理命令"><a href="#一、管理命令" class="headerlink" title="一、管理命令"></a>一、管理命令</h2><ul>
+<li><code>docker version</code>，查看docker客户端及服务端的版本信息；</li>
+<li><code>docker info</code>，查看docker容器的详细信息，除了如上版本信息，还有镜像、容器数据卷、容器网络、Registry地址、物理配置等信息；</li>
+<li><code>docker --help</code>，查看命令帮助；</li>
+</ul>
+<h2 id="二、镜像命令"><a href="#二、镜像命令" class="headerlink" title="二、镜像命令"></a>二、镜像命令</h2><ul>
+<li><code>docker images</code>，查看本地所有顶层镜像（top level）信息的命令，按照创建时间倒序展示 ；<ul>
+<li><code>docker images -a</code>，查看本地所有镜像信息的命令，包含中间层；</li>
+<li><code>docker images -q</code>，只显示镜像ID；</li>
+<li><code>docker images name:tag</code>，根据镜像name:tag来查看详细信息，不支持模糊搜索；</li>
+</ul>
+</li>
+<li><code>docker history</code>，查看镜像的历史信息；<ul>
+<li><code>docker history name:tag</code>，查看name:tag对应镜像的历史信息；</li>
+</ul>
+</li>
+<li><code>docker search</code>，镜像搜索命令；<ul>
+<li><code>docker search name</code>，根据镜像name进行搜索；</li>
+<li><code>docker search --filter=stars=1000 name</code>，增加筛选条件，只查询stars数量在1000以上的；</li>
+</ul>
+</li>
+<li><code>docker pull</code>，拉取镜像；<ul>
+<li><code>docker pull name:tag</code>，根据name和tag拉取镜像；</li>
+</ul>
+</li>
+<li><code>docker rmi</code>，移除镜像；<ul>
+<li><code>docker rmi name:tag</code>，根据name和tag删除镜像，该镜像如果已经生成容器则不能删除；如果同一个镜像有多个tag，则只有当最后一个tag删除时才会删除镜像；</li>
+<li><code>docker rmi -f name:tag</code>，强制删除镜像，如论是否创建容器；</li>
+<li><code>docker rmi -f $&#123;docker images -q&#125;</code>，强制删除本地所有镜像；</li>
+<li><code>docker rmi id</code>，根据镜像ID删除镜像，会先删除所有tag，然后删除镜像；</li>
+</ul>
+</li>
+<li><code>docker build</code>，构建镜像；<ul>
+<li><code>docker build -f container_path/dockerfile -t name:tag .</code>，指定dockerfile构建name:tag镜像，注意最后有一个.符号；</li>
+</ul>
+</li>
+<li><code>docker save</code>，导出镜像，适用于需要将镜像安装到没有网络条件的服务器上的场景；<ul>
+<li><code>docker save -o E:\httpd.zip httpd:latest</code>，将本地仓库中的httpd镜像导入到指定目录的指定文件中；</li>
+</ul>
+</li>
+<li><code>docker load</code>，从指定文件中加载镜像，适用于在无网络条件的服务器上使用；<ul>
+<li><code>docker load -i E:\httpd.zip</code>，从指定目录的指定文件中加载镜像到本地仓库中；</li>
+</ul>
+</li>
+<li><code>docker tag</code>，给指定的镜像打tag，常用于指定别名，用于上传到远程镜像仓库场景；<ul>
+<li><code>docker tag httpd:latest zhangxun/httd:latest</code>，一个镜像两个tag，删除任意一个都不会删除镜像，只有当所有tag都删除了才会真正删除镜像；但是如果删除镜像ID，则会先删除所有tag，再删除镜像；</li>
+<li><code>docker tag id zhangxun/httpd:latest</code>，对指定ID的镜像打tag；</li>
+<li><code>docker tag id test.tecentcloudcr.com/project/httpd:latest</code>，在新tag前面加上registry地址，表示后续将该镜像推送到指定的远程仓库，而非官方的Docker Hub；</li>
+</ul>
+</li>
+<li><code>docker push</code>，将镜像推送到远程镜像仓库；<ul>
+<li><code>docker push zhangxun/httpd:latest</code>，默认是推送到Docker Hub的远程仓库，一定要加上用户名前缀，否则无法推送，没有用户名前缀的都是官方镜像；</li>
+<li><code>docker push test.tecentcloudcr.com/project/httpd:latest</code>，推送到指定的远程仓库；</li>
+</ul>
+</li>
+</ul>
+<h2 id="三、容器命令"><a href="#三、容器命令" class="headerlink" title="三、容器命令"></a>三、容器命令</h2><ul>
+<li><code>docker run</code>，新建并启动容器命令；<ul>
+<li><code>docker run -it name</code>，以交互方式新建启动容器，此处name为image的，非容器的，此时容器name随机；</li>
+<li><code>docker run --name newname name</code>，新启动的容器指定名称为newname；</li>
+<li><code>docker run -d name</code>，以守护方式启动容器；</li>
+<li><code>docker run -it -v local_path:container_path name</code>，-v是指挂载数据卷，使得主机和容器地址挂载；</li>
+<li><code>docker run --name name02 --volumes-from name01 name:tag</code>，启动name02容器，共享name01数据卷，name01称为数据卷容器；</li>
+<li><code>docker run -it --network=bridge name</code>，启动容器使用某个指定的网络；</li>
+</ul>
+</li>
+<li><code>docker start</code>，启动容器命令；<ul>
+<li><code>docker start name</code>，这里的name是容器的name；</li>
+</ul>
+</li>
+<li><code>docker restart</code>，重启容器命令；<ul>
+<li><code>docker restart name</code>，这里的name是容器的name；</li>
+</ul>
+</li>
+<li><code>docker stop</code>，停止容器命令；</li>
+<li><code>docker kill</code>，杀掉正在运行中的某个容器；</li>
+<li><code>docker rm</code>，移除容器；</li>
+<li><code>docker ps</code>，查看容器命令；<ul>
+<li><code>docker ps -q</code>，只显示容器ID；</li>
+<li><code>docker ps -a</code>，显示正在运行和历史运行过的容器信息；</li>
+<li><code>docker ps -l -n num</code>，显示最近创建的num个容器信息；<br>  -<code>docker container ps</code>和<code>docker container ls</code>的效果和<code>docker ps</code>完全一样；</li>
+</ul>
+</li>
+<li><code>docker top</code>，查看容器中的进程信息；<ul>
+<li><code>docker top name</code>，查看name容器中的进程信息；</li>
+<li><code>docker container top name</code>效果完全一样。</li>
+</ul>
+</li>
+<li><code>docker stats</code>，查看容器的运行情况资源占用情况；<ul>
+<li><code>docker stats name</code>，查看某个容器的运行情况；</li>
+<li><code>docker container stats</code>，效果完全一样；</li>
+</ul>
+</li>
+<li><code>docker logs</code>， 查看容器中的日志；<ul>
+<li><code>docker logs -f -t --tail=20 name</code>，查看name容器中的日志，-f表示跟踪日志输出，-t显示时间戳，–tail n，只显示最新的n条日志信息；</li>
+</ul>
+</li>
+<li><code>docker inspect</code>，查看docker容器的详细信息；<ul>
+<li><code>docker inspect name</code>，查看某个容器的详细信息；</li>
+</ul>
+</li>
+<li><code>docker attach</code>，进入容器；<ul>
+<li><code>docker attach name</code>，进入正在运行的容器name的命令行，显示该容器的运行信息；</li>
+</ul>
+</li>
+<li><code>docker exec</code>，进入容器并执行命令；<ul>
+<li><code>docker exec -it name cmd</code>，以交互方式进入容器name，同时执行cmd命令；</li>
+</ul>
+</li>
+<li><code>docker commit</code>，打包生成镜像；<ul>
+<li><code>docker commit -a=&quot;author&quot; -m=&quot;commit info&quot; name newname:tag</code>，写上作者、提交信息，并将当前容器打包为newname:tag的容器；</li>
+</ul>
+</li>
+<li><code>docker cp</code>，容器与宿主机之间的数据拷贝；推荐使用数据卷的功能，所以这个命令实际中不常用；<ul>
+<li><code>docker cp name:/container_path local_path</code>，将name容器中container_path路径下内容cp到宿主机的local_path路径下；</li>
+<li><code>docker cp local_path name:/container_path</code>，将宿主机的local_path路径下内容cp到name容器中container_path路径下</li>
+</ul>
+</li>
+<li><code>docker volume</code>，查看数据卷的信息；<ul>
+<li><code>docker volume ls</code>，查看所有存在的数据卷信息；</li>
+<li><code>docker volume inspect name</code>，查看数据卷的详细信息，比如对应主机的路径；</li>
+<li><code>docker volume create name</code>，创建一个name名称的数据卷；</li>
+</ul>
+</li>
+<li><code>docker network</code>，网络设置相关；<ul>
+<li><code>docker network ls</code>，查看宿主机上docker的网络列表；</li>
+<li><code>docker network inspect name</code>，根据name查看某个具体网络的信息；</li>
+<li><code>docker network create --driver bridge --subnet 172.17.0.0/16 --gateway 172.17.0.1 yourNetName</code>，创建自定义网络，指定网络类型、子网范围以及网关地址；</li>
+</ul>
+</li>
+<li><code>docker export</code>，导出容器；<ul>
+<li><code>docker export -o /root/docker/httpd-01.tar container-id</code>，将某个容器（无论是否正在运行）导出到指定路径的指定文件；</li>
+</ul>
+</li>
+<li><code>docker import</code>，导入容器；<ul>
+<li><code>docker import /root/docker/httpd-01.tar - test/imagename:tag</code>，从指定路径导入容器，同时创建一个基于容器快照的镜像；</li>
+</ul>
+</li>
+</ul>
+]]></content>
+      <categories>
+        <category>dockers</category>
+      </categories>
+      <tags>
+        <tag>docker</tag>
+        <tag>命令</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>docker-compose命令</title>
+    <url>/undefined/6c40434b/</url>
+    <content><![CDATA[<hr>
+<p>docker-compose命令–help                                 # 获得一个命令的帮助<br>docker-compose up -d nginx                               # 构建启动nignx容器<br>docker-compose exec nginx bash                         # 登录到nginx容器中<br>docker-compose down                                            # 此命令将会停止u叩命令所启动的容器，并移除网络<br>docker-compose ps                                               # 列出项目中目前的所有容器<br>docker-compose restart nginx                              # 重新启动nginx容器<br>docker-compose build nginx                                 # 构建镜像<br>docker-compose build –no-cache nginx               # 不带缓存的构建<br>docker-compose top                                                # 查看各个服务容器内运行的进程<br>docker-compose logs-f nginx                                 # 查看nginx的实时日志<br>docker-compose images                                            # 列出Compose文件包含的镜像<br>docker-compose config                             # 验证文件配置，当配置正确时，不输出任何内容，当文件配置错误，输出错误信息。<br>docker-compose events –json nginx                     # 以json的形式输出nginx的docker日志<br>docker-compose pause nginx                               # 暂停nignx容器<br>docker-compose unpause nginx                          # 恢复ningx容器<br>docker-compose rm nginx                                       # 删除容器(删除前必须关闭容器，执行stop)<br>docker-compose stop nginx                                    # 停止nignx容器<br>docker-compose start nginx                                         # 启动nignx容器<br>docker-compose restart nginx                                        # 重启项目中的nignx容器<br>docker-compose run –no-deps –rm php-fpm php -v     # 在php-fpm中不启动关联容器，并容器执行php-v执行完成后删除容器</p>
+]]></content>
+      <categories>
+        <category>dockers</category>
+      </categories>
+      <tags>
+        <tag>docker</tag>
+        <tag>命令</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>docker and docker compose安装</title>
+    <url>/undefined/e817ffda/</url>
+    <content><![CDATA[<h2 id="1、升级-packages"><a href="#1、升级-packages" class="headerlink" title="1、升级 packages"></a>1、升级 packages</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo -i # 切换到 root 用户  </span><br><span class="line">  </span><br><span class="line">apt update -y  # 升级 packages  </span><br><span class="line">  </span><br><span class="line">apt install wget curl sudo vim git -y  # Debian 系统比较干净，安装常用的软件 </span><br></pre></td></tr></table></figure>
+
+
+<h2 id="2、安装-Docker-环境"><a href="#2、安装-Docker-环境" class="headerlink" title="2、安装 Docker 环境"></a>2、安装 Docker 环境</h2><h3 id="安装-Docker（非大陆服务器）"><a href="#安装-Docker（非大陆服务器）" class="headerlink" title="安装 Docker（非大陆服务器）"></a>安装 Docker（非大陆服务器）</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">wget -qO- get.docker.com | bash </span><br><span class="line"></span><br><span class="line">docker -v  #查看 docker 版本  </span><br><span class="line"></span><br><span class="line">systemctl enable docker  # 设置开机自动启动 </span><br></pre></td></tr></table></figure>
+
+<h3 id="安装-Docker-compose（非大陆服务器）"><a href="#安装-Docker-compose（非大陆服务器）" class="headerlink" title="安装 Docker-compose（非大陆服务器）"></a>安装 Docker-compose（非大陆服务器）</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo curl -L &quot;https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)&quot; -o /usr/local/bin/docker-compose </span><br><span class="line"></span><br><span class="line">sudo chmod +x /usr/local/bin/docker-compose </span><br><span class="line"></span><br><span class="line">docker-compose --version  #查看 docker-compose 版本  </span><br></pre></td></tr></table></figure>
+
+<h3 id="安装-Docker（国内服务器）"><a href="#安装-Docker（国内服务器）" class="headerlink" title="安装 Docker（国内服务器）"></a>安装 Docker（国内服务器）</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">curl -sSL https://get.daocloud.io/docker | sh  </span><br><span class="line"></span><br><span class="line">docker -v  #查看 docker 版本  </span><br><span class="line"></span><br><span class="line">systemctl enable docker  # 设置开机自动启动 </span><br></pre></td></tr></table></figure>
+
+<h3 id="安装-Docker-compose（国内服务器）"><a href="#安装-Docker-compose（国内服务器）" class="headerlink" title="安装 Docker-compose（国内服务器）"></a>安装 Docker-compose（国内服务器）</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">curl -L https://get.daocloud.io/docker/compose/releases/download/v2.1.1/docker-compose-`uname -s`-`uname -m` &gt; /usr/local/bin/docker-compose</span><br><span class="line"></span><br><span class="line">chmod +x /usr/local/bin/docker-compose  </span><br><span class="line"></span><br><span class="line">docker-compose --version  #查看 docker-compose 版本 </span><br></pre></td></tr></table></figure>
+<h3 id="修改-Docker-配置（可选）"><a href="#修改-Docker-配置（可选）" class="headerlink" title="修改 Docker 配置（可选）"></a>修改 Docker 配置（可选）</h3><p>以下配置会增加一段自定义内网 IPv6 地址，开启容器的 IPv6 功能，以及限制日志文件大小，防止 Docker 日志塞满硬盘（泪的教训）：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cat &gt; /etc/docker/daemon.json &lt;&lt;EOF  </span><br><span class="line">&#123;  </span><br><span class="line">    &quot;log-driver&quot;: &quot;json-file&quot;,  </span><br><span class="line">    &quot;log-opts&quot;: &#123;  </span><br><span class="line">        &quot;max-size&quot;: &quot;20m&quot;,  </span><br><span class="line">        &quot;max-file&quot;: &quot;3&quot;  </span><br><span class="line">    &#125;,  </span><br><span class="line">    &quot;ipv6&quot;: true,  </span><br><span class="line">    &quot;fixed-cidr-v6&quot;: &quot;fd00:dead:beef:c0::/80&quot;,  </span><br><span class="line">    &quot;experimental&quot;:true,  </span><br><span class="line">    &quot;ip6tables&quot;:true  </span><br><span class="line">&#125;  </span><br><span class="line">EOF  </span><br></pre></td></tr></table></figure>
+
+<p>然后重启 Docker服务：  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">systemctl restart docker</span><br></pre></td></tr></table></figure>
+
+<h3 id="设置SWAP可以用脚本"><a href="#设置SWAP可以用脚本" class="headerlink" title="设置SWAP可以用脚本:"></a>设置SWAP可以用脚本:</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">wget -O box.sh https://raw.githubusercontent.com/BlueSkyXN/SKY-BOX/main/box.sh &amp;&amp; chmod +x box.sh &amp;&amp; clear &amp;&amp; ./box.sh</span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>dockers</category>
+      </categories>
+      <tags>
+        <tag>docker</tag>
+        <tag>dcoker compose</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>nginx proxy manager安装</title>
+    <url>/undefined/e5f66663/</url>
+    <content><![CDATA[<p>图示：<br><img src="https://picgo-1321316737.cos.ap-guangzhou.myqcloud.com/img/20240513145119.png"></p>
+<h2 id="1、主要特点："><a href="#1、主要特点：" class="headerlink" title="1、主要特点："></a>1、主要特点：</h2><ol>
+<li><strong>图形化界面</strong>：提供用户友好的Web界面，允许用户通过点选和表单填写的方式而非手动编辑Nginx配置文件来配置反向代理规则、上游服务器、重定向、SSL证书等，大大降低了配置Nginx的难度。</li>
+<li><strong>自动化SSL证书管理</strong>：无缝集成 Let’s Encrypt，支持一键申请、自动续期 SSL 证书，确保网站安全访问。</li>
+<li><strong>域名和路径基础的路由</strong>：用户可以基于不同的域名或路径设置反向代理规则，实现精细的流量控制。</li>
+<li><strong>Docker集成</strong>：Nginx Proxy Manager 本身设计为Docker镜像，易于部署和升级。通过Docker Compose，可以在几分钟内快速搭建起来，适用于从个人开发者到企业的各种场景。</li>
+<li><strong>多用户支持</strong>：可创建多个用户账户，分配不同的权限，适合团队协作。</li>
+<li><strong>灵活的日志记录</strong>：提供访问日志查看功能，便于监控和故障排查。</li>
+<li><strong>高级功能</strong>：支持WebSocket、HTTP&#x2F;2、ACME DNS验证等多种高级特性。</li>
+</ol>
+<h2 id="创建安装目录"><a href="#创建安装目录" class="headerlink" title="创建安装目录"></a>创建安装目录</h2><p>创建一下安装的目录：  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo -i  </span><br><span class="line">  </span><br><span class="line">mkdir -p /root/data/docker_data/npm  </span><br><span class="line">  </span><br><span class="line">cd /root/data/docker_data/npm  </span><br></pre></td></tr></table></figure>
+
+<p>这边我们直接用docker，参考这篇文章（ [[03、docker and docker compose]]）的方式安装。  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">vim docker-compose.yml </span><br><span class="line">```  </span><br><span class="line"> </span><br><span class="line">英文输入法下，按 i </span><br></pre></td></tr></table></figure>
+<p>version: ‘3’<br>services:<br>  app:<br>    image: ‘jc21&#x2F;nginx-proxy-manager:latest’<br>    restart: unless-stopped<br>    ports:<br>      - ‘80:80’  # 冒号左边可以改成自己服务器未被占用的端口<br>      - ‘81:81’  # 冒号左边可以改成自己服务器未被占用的端口<br>      - ‘443:443’ # 冒号左边可以改成自己服务器未被占用的端口<br>    volumes:<br>      - .&#x2F;data:&#x2F;data # 冒号左边可以改路径，现在是表示把数据存放在在当前文件夹下的 data 文件夹中<br>      - .&#x2F;letsencrypt:&#x2F;etc&#x2F;letsencrypt  # 冒号左边可以改路径，现在是表示把数据存放在在当前文件夹下的 letsencrypt 文件夹中  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">按一下 esc，然后 :wq 保存退出，之后，  </span><br><span class="line">  </span><br><span class="line">查看端口是否被占用（以 81 为例），输入：  </span><br><span class="line">  </span><br><span class="line">lsof -i:81  # 查看 81 端口是否被占用，如果被占用，重新自定义一个端口  </span><br><span class="line">如果啥也没出现，表示端口未被占用，我们可以继续下面的操作了～  </span><br><span class="line">  </span><br><span class="line">如果出现：  </span><br><span class="line">  </span><br><span class="line">-bash: lsof: command not found  </span><br><span class="line">运行：  </span><br><span class="line">  </span><br><span class="line">apt install lsof  # 安装 lsof  </span><br><span class="line">如果端口没有被占用（被占用了就修改一下端口，比如改成 82，注意 docker 命令行里和防火墙都要改）  </span><br><span class="line">  </span><br><span class="line">运行并访问 Nginx Proxy Manager  </span><br><span class="line">最后：  </span><br></pre></td></tr></table></figure>
+<p>cd &#x2F;root&#x2F;data&#x2F;docker_data&#x2F;npm   # 来到 dockercompose 文件所在的文件夹下  </p>
+<p>docker-compose up -d   </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">理论上我们就可以输入 http://ip:81 访问了。  </span><br><span class="line">  </span><br><span class="line">默认登陆名和密码：  </span><br><span class="line">  </span><br><span class="line">Email:    admin@example.com  </span><br><span class="line">Password: changeme  </span><br><span class="line"></span><br><span class="line">注意：  </span><br><span class="line">  </span><br><span class="line">1、不知道服务器 IP，可以直接在命令行输入：curl ip.sb，会显示当前服务器的 IP。  </span><br><span class="line">  </span><br><span class="line">2、遇到访问不了的情况，请再次检查在宝塔面板的防火墙和服务商的后台防火墙是否打开对应了端口。  </span><br><span class="line">  </span><br><span class="line">## 更新 Nginx Proxy Manager  </span><br></pre></td></tr></table></figure>
+<p>cd &#x2F;root&#x2F;data&#x2F;docker_data&#x2F;npm  </p>
+<p>docker-compose down   </p>
+<p>cp -r &#x2F;root&#x2F;data&#x2F;docker_data&#x2F;npm &#x2F;root&#x2F;data&#x2F;docker_data&#x2F;npm.archive  # 万事先备份，以防万一  </p>
+<p>docker-compose pull  </p>
+<p>docker-compose up -d      </p>
+<p>docker image prune  # prune 命令用来删除不再使用的 docker 对象。删除所有未被 tag 标记和未被容器使用的镜像  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">提示：  </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">WARNING! This will remove all dangling images.  </span><br><span class="line">Are you sure you want to continue? [y/N]   </span><br><span class="line">输入 y  </span><br><span class="line">  </span><br><span class="line">利用 Docker 搭建的应用，更新非常容易</span><br><span class="line">  </span><br><span class="line">## 卸载 Nginx Proxy Manager  </span><br></pre></td></tr></table></figure>
+<p>cd &#x2F;root&#x2F;data&#x2F;docker_data&#x2F;npm  </p>
+<p>docker-compose down   </p>
+<p>rm -rf &#x2F;root&#x2F;data&#x2F;docker_data&#x2F;npm  # 完全删除映射到本地的数据  </p>
+<pre><code>
+可以卸载得很干净。
+</code></pre>
+]]></content>
+      <categories>
+        <category>dockers</category>
+      </categories>
+      <tags>
+        <tag>docker</tag>
+        <tag>npm</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>整理一些常用的脚本</title>
+    <url>/undefined/91208508/</url>
+    <content><![CDATA[<p>Halo 2.0是一款基于Spring Boot和Vue.js框架构建的现代化开源内容管理系统（CMS），专为个人博客及小型网站设计。作为一款开源软件，Halo不仅代码开放，而且完全免费，这意味着用户可以自由地查看、修改源代码以适应个性化需求，同时也能够享受到社区的支持和持续的更新。</p>
+<h2 id="Halo-2-0的一些显著特点："><a href="#Halo-2-0的一些显著特点：" class="headerlink" title="Halo 2.0的一些显著特点："></a>Halo 2.0的一些显著特点：</h2><ol>
+<li><strong>快速启动与轻量级</strong>：借助Docker容器化技术，Halo 2.0可以迅速启动，资源占用小，非常适合快速搭建个人博客。容器化的部署方式确保了环境的一致性，无论在本地开发还是云端部署都能保持相同的运行效果。</li>
+<li><strong>高性能与高效率</strong>：利用Docker的高效资源利用能力，Halo能够在低资源消耗的前提下提供稳定的性能表现。其背后的技术栈如Spring Boot和Vue.js，都是为提高开发效率和运行时性能而精心选择的。</li>
+<li><strong>现代化技术栈</strong>：采用Spring Boot作为后端框架，保证了应用的快速开发与部署能力，同时Vue.js作为前端框架，提供了流畅的用户交互体验和响应式设计，使得网站在不同设备上都能有良好的展示效果。</li>
+<li><strong>易部署与维护</strong>：通过Docker部署，用户可以轻松地在任何支持Docker的系统上部署Halo，极大地简化了环境配置的复杂度。Docker Compose的使用更是使得多服务协作变得简单，一键即可完成整个博客系统的搭建与配置。</li>
+<li><strong>模块化与可扩展性</strong>：Halo设计上支持插件和主题的扩展，用户可以根据需要安装各种功能插件或更换界面主题，以丰富博客的功能和个性化外观。</li>
+<li><strong>云原生友好</strong>：作为云原生时代的产品，Halo 2.0对云环境有着良好的支持，便于在云服务商上部署和运维，支持自动扩缩容等高级特性。</li>
+<li><strong>社区活跃与文档齐全</strong>：拥有活跃的开发者社区，不断更新的文档和示例，即使是初学者也能快速上手，遇到问题时容易找到帮助。</li>
+</ol>
+<h2 id="2-项目展示"><a href="#2-项目展示" class="headerlink" title="2. 项目展示"></a>2. 项目展示</h2><p>文档地址：<a href="http://docs.halo.run/" title="http://docs.halo.run/"></a><a href="http://docs.halo.run/" title="http://docs.halo.run/">http://docs.halo.run/</a><br>社区地址：<a href="https://bbs.halo.run/" title="https://bbs.halo.run/"></a><a href="https://bbs.halo.run/" title="https://bbs.halo.run/">https://bbs.halo.run/</a><br>官网地址：<a href="https://halo.run/" title="https://halo.run/"></a><a href="https://halo.run/" title="https://halo.run/">https://halo.run/</a><br>GitHub地址：<a href="https://github.com/halo-dev/halo" title="https://github.com/halo-dev/halo"></a><a href="https://github.com/halo-dev/halo" title="https://github.com/halo-dev/halo">https://github.com/halo-dev/halo</a><br>Demo地址：<a href="https://demo.halo.run/" title="https://demo.halo.run/"></a><a href="https://demo.halo.run/" title="https://demo.halo.run/">https://demo.halo.run</a><br>Demo后台：<a href="https://demo.halo.run/console" title="https://demo.halo.run/console"></a><a href="https://demo.halo.run/console" title="https://demo.halo.run/console">https://demo.halo.run/console</a><br>用户名：<code>demo</code><br>密码：<a href="mailto:code%3EP@ssw0rd123..%3C/code" title="mailto:code%3EP@ssw0rd123..%3C/code">code&gt;P@ssw0rd123..</a></p>
+<p><a href="mailto:code%3EP@ssw0rd123..%3C/code" title="mailto:code%3EP@ssw0rd123..%3C/code">注意：<code>docker-compose.yml</code> 里面的<code>--halo.external-url=</code></a><code>[http://localhost:8090/](http://localhost:8090/)</code> ，其中的<code>[http://localhost:8090/](http://localhost:8090/)</code>需要更改为你的域名，如果你打算用的域名是<code>abc.com</code>也就是要改成<code>--halo.external-url=[https://abc.com](https://abc.com/)</code></p>
+<p>版本号<code>2.6.0</code>，可以看这边：<a href="https://github.com/halo-dev/halo/releases" title="https://github.com/halo-dev/halo/releases"></a><a href="https://github.com/halo-dev/halo/releases" title="https://github.com/halo-dev/halo/releases">https://github.com/halo-dev/halo/releases</a> 保证自己是新版本～</p>
+<p>接着，千万记得改密码！！！</p>
+<p>不然，你也会像这样：</p>
+<p><a href="https://img.laoda.de/i/2023/03/09/r8ovzn-0.webp" title="https://img.laoda.de/i/2023/03/09/r8ovzn-0.webp"><img src="https://iwanlab.com/docker-compose-install-halo-version-2/75799c30a3a90bd3e5dc2d6f3c6286d4.png">  
+</a></p>
+<p>PS：细心的小伙伴会发现，<code>docker-compose.yml</code>里面数据库<code>3306</code>并没有写成<code>3306:3306</code>，官网是写的后者，咕咕改成了前者，为的就是不在公网暴露halo数据库的端口，这样也能一定程度保障博客的安全。</p>
+<p>以下是详细搭建教程。</p>
+<h2 id="3-搭建环境"><a href="#3-搭建环境" class="headerlink" title="3. 搭建环境"></a>3. 搭建环境</h2><ul>
+<li>系统：Debian 10 （<a href="https://blog.laoda.de/archives/useful-script#dd%E7%9B%B8%E5%85%B3" title="https://blog.laoda.de/archives/useful-script#dd%E7%9B%B8%E5%85%B3">DD 脚本</a> 非必需 DD，用原来的系统也 OK，之后教程都是用 Debian 或者 Ubuntu 搭建～）</li>
+<li>安装好 Docker、Docker-compose（<a href="https://blog.laoda.de/archives/hello-docker#5%E5%AE%89%E8%A3%85dockerdocker-compose" title="https://blog.laoda.de/archives/hello-docker#5%E5%AE%89%E8%A3%85dockerdocker-compose">相关脚本</a>）</li>
+<li>【非必需但建议】域名一枚，并做好解析到服务器上（<a href="https://blog.laoda.de/archives/namesilo" title="https://blog.laoda.de/archives/namesilo">域名购买、域名解析</a> <a href="https://www.bilibili.com/video/BV1Sy4y1k7kZ/" title="https://www.bilibili.com/video/BV1Sy4y1k7kZ/">视频教程</a>）</li>
+<li>【非必需】提前安装好宝塔面板海外版本 aapanel，并安装好 Nginx（<a href="https://forum.aapanel.com/d/9-aapanel-linux-panel-6812-installation-tutorial" title="https://forum.aapanel.com/d/9-aapanel-linux-panel-6812-installation-tutorial">安装地址</a>）</li>
+<li>【非必需本教程选用】安装好 Nginx Proxy Manager（<a href="https://blog.laoda.de/archives/nginxproxymanager" title="https://blog.laoda.de/archives/nginxproxymanager">相关教程</a>）</li>
+</ul>
+<blockquote>
+<p>服务器要求：内存建议1G 以上，硬盘可以大一些。</p>
+</blockquote>
+<h2 id="4-搭建视频"><a href="#4-搭建视频" class="headerlink" title="4. 搭建视频"></a>4. 搭建视频</h2><p>视频地址：<a href="https://www.bilibili.com/BV1wk4y1h7Ma" title="https://www.bilibili.com/BV1wk4y1h7Ma"></a><a href="https://www.bilibili.com/BV1wk4y1h7Ma" title="https://www.bilibili.com/BV1wk4y1h7Ma">https://www.bilibili.com/BV1wk4y1h7Ma</a></p>
+<h2 id="5-搭建方式"><a href="#5-搭建方式" class="headerlink" title="5. 搭建方式"></a>5. 搭建方式</h2><p>创建一下安装的目录：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo -i</span><br><span class="line"></span><br><span class="line">mkdir -p /root/data/docker_data/halo</span><br><span class="line">cd /root/data/docker_data/halo</span><br><span class="line"></span><br><span class="line">vim docker-compose.yml</span><br></pre></td></tr></table></figure>
+
+<p>这边我们直接用 docker 的方式安装。</p>
+<p>英文输入法下，按 <code>i</code></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">version: &quot;3&quot;</span><br><span class="line"></span><br><span class="line">services:</span><br><span class="line">  halo:</span><br><span class="line">    image: halohub/halo:2.10.0</span><br><span class="line">    container_name: halo</span><br><span class="line">    restart: on-failure:3</span><br><span class="line">    depends_on:</span><br><span class="line">      halodb:</span><br><span class="line">        condition: service_healthy</span><br><span class="line">    networks:</span><br><span class="line">      halo_network:</span><br><span class="line">    volumes:</span><br><span class="line">      - ./:/root/.halo2</span><br><span class="line">    ports:</span><br><span class="line">      - &quot;8080:8090&quot; #左边端口随便改</span><br><span class="line">    command:</span><br><span class="line">      - --spring.r2dbc.url=r2dbc:pool:mysql://halodb:3306/halo</span><br><span class="line">      - --spring.r2dbc.username=root</span><br><span class="line">      </span><br><span class="line">      - --spring.r2dbc.password=o#DwN&amp;JSa56</span><br><span class="line">      - --spring.sql.init.platform=mysql</span><br><span class="line">      </span><br><span class="line">      - --halo.external-url=https://www.example.com</span><br><span class="line">      </span><br><span class="line">      - --halo.security.initializer.superadminusername=admin</span><br><span class="line">      </span><br><span class="line">      - --halo.security.initializer.superadminpassword=P@88w0rd</span><br><span class="line"></span><br><span class="line">  halodb:</span><br><span class="line">    image: mysql:8.0.31</span><br><span class="line">    container_name: halodb</span><br><span class="line">    restart: on-failure:3</span><br><span class="line">    networks:</span><br><span class="line">      halo_network:</span><br><span class="line">    command: </span><br><span class="line">      - --default-authentication-plugin=mysql_native_password</span><br><span class="line">      - --character-set-server=utf8mb4</span><br><span class="line">      - --collation-server=utf8mb4_general_ci</span><br><span class="line">      - --explicit_defaults_for_timestamp=true</span><br><span class="line">    volumes:</span><br><span class="line">      - ./mysql:/var/lib/mysql</span><br><span class="line">      - ./mysqlBackup:/data/mysqlBackup</span><br><span class="line">    ports:</span><br><span class="line">      - &quot;3306&quot;</span><br><span class="line">    healthcheck:</span><br><span class="line">      test: [&quot;CMD&quot;, &quot;mysqladmin&quot;, &quot;ping&quot;, &quot;-h&quot;, &quot;127.0.0.1&quot;, &quot;--silent&quot;]</span><br><span class="line">      interval: 3s</span><br><span class="line">      retries: 5</span><br><span class="line">      start_period: 30s</span><br><span class="line">    environment:</span><br><span class="line">      </span><br><span class="line">      - MYSQL_ROOT_PASSWORD=o#DwN&amp;JSa56</span><br><span class="line">      - MYSQL_DATABASE=halo</span><br><span class="line"></span><br><span class="line">networks:</span><br><span class="line">  halo_network:</span><br></pre></td></tr></table></figure>
+
+<p>注意：<code>docker-compose.yml</code> 里面的<code>--halo.external-url=[http://localhost:8090/](http://localhost:8090/)</code> ，其中的<code>[http://localhost:8090/](http://localhost:8090/)</code>需要更改为你的域名，如果你打算用的域名是<code>abc.com</code>也就是要改成<code>--halo.external-url=[https://abc.com](https://abc.com/)</code></p>
+<p>版本号<code>2.6.0</code>，可以看这边：<a href="https://github.com/halo-dev/halo/releases" title="https://github.com/halo-dev/halo/releases"></a><a href="https://github.com/halo-dev/halo/releases" title="https://github.com/halo-dev/halo/releases">https://github.com/halo-dev/halo/releases</a> 保证自己是新版本～</p>
+<p>接着，千万记得改密码！！！<br>PS：细心的小伙伴会发现，<code>docker-compose.yml</code>里面数据库<code>3306</code>并没有写成<code>3306:3306</code>，官网是写的后者，咕咕改成了前者，为的就是不在公网暴露halo数据库的端口，这样也能一定程度保障博客的安全。</p>
+<p>修改好之后，注意切换成英文输入法，然后按一下 <code>esc</code>，然后 <code>:wq</code> 保存退出。</p>
+<h3 id="5-3-打开服务器防火墙（非必需）并访问网页"><a href="#5-3-打开服务器防火墙（非必需）并访问网页" class="headerlink" title="5.3 打开服务器防火墙（非必需）并访问网页"></a>5.3 打开服务器防火墙（非必需）并访问网页</h3><p>打开防火墙的端口 <code>8090</code></p>
+<p>举例，腾讯云打开方法如下（部分服务商没有自带的面板防火墙，就不用这步操作了）：</p>
+<p>图中示例填的是 <code>5230</code>，备注填的是 <code>memos</code>，这边我们填 <code>8090</code>，示例填 <code>halo</code> ，确定即可（如果你在 docker-compose 文件里换了 <code>9009</code>，这边就需要填 <code>9009</code>，以此类推）<br>查看端口是否被占用（以 <code>8090</code> 为例），输入：</p>
+<p>如果啥也没出现，表示端口未被占用，我们可以继续下面的操作了～</p>
+<p>如果出现：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">-bash: lsof: command not found</span><br></pre></td></tr></table></figure>
+
+<p>运行：</p>
+<p>如果端口没有被占用（被占用了就修改一下端口，比如改成 <code>8081</code>，注意 docker 命令行里和防火墙都要改）</p>
+<p>最后：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cd /root/data/docker_data/halo    </span><br><span class="line"></span><br><span class="line">docker-compose up -d </span><br></pre></td></tr></table></figure>
+
+<p>理论上我们就可以输入 <code>[http://ip:8090](http://ip:8090/)</code> 访问安装了。</p>
+<blockquote>
+<p><strong>注意：</strong></p>
+<p>1、不知道服务器 IP，可以直接在命令行输入：<code>curl ip.sb</code>，会显示当前服务器的 IP。</p>
+<p>2、遇到访问不了的情况，请再次检查在宝塔面板的防火墙和服务商的后台防火墙是否打开对应了端口。</p>
+</blockquote>
+<p>有的小伙伴可能想搭建起来分享给其他人使用，如果后续想要分享给别人，IP + 端口太不优雅了，咕咕建议大家还是搞一个域名，容易记，看起来也更正规一点。这样可以做 https，会让网页更安全。</p>
+<p>我们接着往下看！</p>
+<h3 id="5-4-更新-halo"><a href="#5-4-更新-halo" class="headerlink" title="5.4 更新 halo"></a>5.4 更新 halo</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cd /root/data/docker_data/halo</span><br><span class="line"></span><br><span class="line">docker-compose down </span><br><span class="line"></span><br><span class="line">cp -r /root/data/docker_data/halo /root/data/docker_data/halo.archive  </span><br><span class="line"></span><br><span class="line">docker-compose pull</span><br><span class="line"></span><br><span class="line">docker-compose up -d    </span><br><span class="line"></span><br><span class="line">docker image prune  </span><br></pre></td></tr></table></figure>
+
+<p>提示：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">WARNING! This will remove all dangling images.</span><br><span class="line">Are you sure you want to continue? [y/N] </span><br></pre></td></tr></table></figure>
+
+<p>输入 <code>y</code></p>
+<p>利用 Docker 搭建的应用，更新非常容易～</p>
+<h3 id="5-5-卸载-halo"><a href="#5-5-卸载-halo" class="headerlink" title="5.5 卸载 halo"></a>5.5 卸载 halo</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cd /root/data/docker_data/halo</span><br><span class="line"></span><br><span class="line">docker-compose down</span><br><span class="line"></span><br><span class="line">cd ..</span><br><span class="line"></span><br><span class="line">rm -rf /root/data/docker_data/halo  </span><br></pre></td></tr></table></figure>
+
+<p>可以卸载得很干净。</p>
+<h2 id="6-反向代理"><a href="#6-反向代理" class="headerlink" title="6. 反向代理"></a>6. 反向代理</h2><p>我们要用域名而不是IP+端口的方式来访问我们的服务！</p>
+<h3 id="6-1-利用-Nginx-Proxy-Manager"><a href="#6-1-利用-Nginx-Proxy-Manager" class="headerlink" title="6.1 利用 Nginx Proxy Manager"></a>6.1 利用 Nginx Proxy Manager</h3><p>在添加反向代理之前，确保你已经完成了域名解析，不会的可以看这个：<strong>域名一枚，并做好解析到服务器上</strong></p>
+<p>[<img src="file://C:/Users/25082/.config/joplin-desktop/resources/5110c0b7d77a458ab42d1dc481e00778.webp?t=1696908655554"><br>之后，登陆 Nginx Proxy Manager</p>
+<blockquote>
+<p><strong>注意：</strong></p>
+<p>Nginx Proxy Manager（以下简称 NPM）会用到 <code>80</code>、<code>443</code> 端口，所以本机不能占用（比如原来就有 Nginx）</p>
+</blockquote>
+<p>直接丢几张图：</p>
+<blockquote>
+<p>注意填写对应的 <code>域名</code>、<code>IP</code> 和 <code>端口</code>，按文章来的话，应该是 <code>8090</code></p>
+</blockquote>
+<p><strong>IP 填写：</strong></p>
+<p>如果 Nginx Proxy Manager 和 halo 在同一台服务器上，可以在终端输入：</p>
+<p>查看对应的 Docker 容器内部 IP。</p>
+<p><a href="https://img.laoda.de/i/2022/09/29/pcdnz5-2.webp" title="https://img.laoda.de/i/2022/09/29/pcdnz5-2.webp"><img src="file://C:/Users/25082/.config/joplin-desktop/resources/f14cb29ac68a4d9eb9fef3fad1bf3282.webp?t=1696908655577">  
+</a></p>
+<p>否则直接填 <code>halo</code> 所在的服务器 IP 就行。</p>
+<p>注意：<code>docker-compose.yml</code> 里面的<code>--halo.external-url=[http://localhost:8090/](http://localhost:8090/)</code> ，其中的<code>[http://localhost:8090/](http://localhost:8090/)</code>需要更改为你的域名，如果你的域名是<code>abc.com</code>也就是要改成<code>--halo.external-url=[https://abc.com](https://abc.com/)</code></p>
+<h3 id="6-2-利用宝塔面板"><a href="#6-2-利用宝塔面板" class="headerlink" title="6.2 利用宝塔面板"></a>6.2 利用宝塔面板</h3><p>发现还是有不少小伙伴习惯用宝塔面板，这边也贴一个宝塔面板的反代配置：</p>
+<p>直接新建一个站点，不要数据库，不要 php，纯静态即可。</p>
+<p>然后打开下面的配置，修改 Nginx 的配置。</p>
+<p><a href="https://img.laoda.de/i/2022/08/19/ov4xrt-2.webp" title="https://img.laoda.de/i/2022/08/19/ov4xrt-2.webp"><img src="file://C:/Users/25082/.config/joplin-desktop/resources/90b11e62bf5d4eb39071f38017dad1ba.webp?t=1696908655602">  
+</a><br><a href="https://img.laoda.de/i/2022/08/19/owbbkb-2.webp" title="https://img.laoda.de/i/2022/08/19/owbbkb-2.webp"><img src="file://C:/Users/25082/.config/joplin-desktop/resources/c16b6f2415ab438d87a5fc8ea6ee0826.webp?t=1696908655614">  
+</a></p>
+<p>代码如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">location / &#123;</span><br><span class="line">  proxy_pass http://127.0.0.1:8090/;       </span><br><span class="line">  rewrite ^/(.*)$ /$1 break;</span><br><span class="line">  proxy_redirect off;</span><br><span class="line">  proxy_set_header Host $host;</span><br><span class="line">  proxy_set_header X-Forwarded-Proto $scheme;</span><br><span class="line">  proxy_set_header X-Real-IP $remote_addr;</span><br><span class="line">  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;</span><br><span class="line">  proxy_set_header Upgrade-Insecure-Requests 1;</span><br><span class="line">  proxy_set_header X-Forwarded-Proto https;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>此方法对 90% 的反向代理都能生效，然后就可以用域名来安装访问了。</p>
+<p>有同学可能会问，为什么不直接用宝塔自带的反向代理功能。</p>
+<p><a href="https://img.laoda.de/i/2022/08/19/oxf800-2.webp" title="https://img.laoda.de/i/2022/08/19/oxf800-2.webp"><img src="file://C:/Users/25082/.config/joplin-desktop/resources/a587face6d63428e85548a49818f184f.webp?t=1696908655626">  
+</a></p>
+<p>也可以，不过咕咕自己之前遇到过当有多个网站需要反代的时候，在这边设置会报错的情况 &#x3D; &#x3D;</p>
+<p>所以后来就不用了，直接用上面的方法来操作了。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p>文档地址：<a href="http://docs.halo.run/" title="http://docs.halo.run/"></a><a href="http://docs.halo.run/" title="http://docs.halo.run/">http://docs.halo.run/</a><br>社区地址：<a href="https://bbs.halo.run/" title="https://bbs.halo.run/"></a><a href="https://bbs.halo.run/" title="https://bbs.halo.run/">https://bbs.halo.run/</a><br>官网地址：<a href="https://halo.run/" title="https://halo.run/"></a><a href="https://halo.run/" title="https://halo.run/">https://halo.run/</a><br>GitHub地址：<a href="https://github.com/halo-dev/halo" title="https://github.com/halo-dev/halo"></a><a href="https://github.com/halo-dev/halo" title="https://github.com/halo-dev/halo">https://github.com/halo-dev/halo</a></p>
+]]></content>
+      <categories>
+        <category>dockers</category>
+      </categories>
+      <tags>
+        <tag>docker</tag>
+        <tag>blog</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Typecho博客搭建</title>
+    <url>/undefined/368776e6/</url>
+    <content><![CDATA[<p>Typecho 是一款基于 PHP 和 MySQL 的开源博客程序，它以其轻量级、高效以及高度可定制性著称。尽管 Typecho 本身不是直接作为 Docker 应用发布，但社区中存在不少利用 Docker 容器技术来部署和管理 Typecho 的方案，这使得在各种环境中部署 Typecho 变得更加便捷和统一。以下是使用 Docker 部署 Typecho 时体现出的一些特点和优势：</p>
+<ol>
+<li><strong>简易部署与迁移</strong>：通过 Docker 镜像，如 <code>80x86/typecho</code>，部署 Typecho 变得异常简单，只需几个 Docker 命令即可快速启动博客服务，无需关心复杂的环境配置。这种方式也极大地方便了应用的迁移，无论是从本地到服务器，还是跨云服务商，都能通过 Docker 镜像轻松实现。</li>
+<li><strong>环境一致性</strong>：Docker 确保了开发、测试和生产环境的高度一致性，避免了因环境差异导致的部署问题，这对于维护一个稳定运行的 Typecho 博客至关重要。</li>
+<li><strong>资源隔离与管理</strong>：Docker 容器化技术为 Typecho 提供了独立的运行环境，它不会干扰宿主机上的其他服务或应用，同时容器资源的限制功能也帮助有效管理资源使用，防止资源滥用影响系统稳定性。</li>
+<li><strong>易于扩展与集成</strong>：结合 Docker Compose，可以轻松创建包含 MySQL 数据库、反向代理（如 Nginx）等在内的复杂环境，实现一站式部署包含所有依赖的 Typecho 博客系统。这样的配置使得添加缓存服务、日志收集等扩展功能变得非常简单。</li>
+<li><strong>持续集成与部署</strong>（CI&#x2F;CD）：Docker 化的 Typecho 更容易集成到现代 DevOps 流程中，支持自动化测试和部署，加速开发迭代速度。</li>
+<li><strong>安全性和隔离性</strong>：使用 Docker 部署 Typecho 可以通过网络策略和权限控制增强安全性，限制容器对外界的访问，减少潜在的安全风险。</li>
+</ol>
+<h2 id="1-介绍"><a href="#1-介绍" class="headerlink" title="1. 介绍"></a>1. 介绍</h2><p><a href="https://iwanlab.com/tag/typecho/">Typecho</a>时隔多年，终于在今年更新了新版本，非常轻量的一款博客，整个源文件就<code>608K</code></p>
+<p>正常来说，这个是不适合用Docker来部署的，因为会把一个轻量的东西弄得很“重”，但是，谁叫我们懒呢，用Docker部署，维护和搬家方便呀，而且部署也简单，所以今天就索性来折腾一下吧。</p>
+<h2 id="2-搭建方式"><a href="#2-搭建方式" class="headerlink" title="2. 搭建方式"></a>2. 搭建方式</h2><h3 id="2-1-搭建"><a href="#2-1-搭建" class="headerlink" title="2.1 搭建"></a>2.1 搭建</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo -i # 切换到root用户</span><br><span class="line"></span><br><span class="line">apt update -y  # 升级packages</span><br><span class="line"></span><br><span class="line">apt install wget curl sudo vim git  # Debian系统比较干净，安装常用的软件</span><br></pre></td></tr></table></figure>
+
+<p>创建一下安装的目录：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mkdir -p /root/data/typecho</span><br><span class="line"></span><br><span class="line">cd /root/data/typecho</span><br></pre></td></tr></table></figure>
+
+<p>先创建几个文件。</p>
+<h4 id="2-1-1-mysql"><a href="#2-1-1-mysql" class="headerlink" title="2.1.1 mysql"></a>2.1.1 mysql</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cd /root/data/typecho</span><br><span class="line"></span><br><span class="line">nano mysql.env</span><br></pre></td></tr></table></figure>
+
+<p>填入下面的内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">MYSQL_ROOT_PASSWORD=123</span><br><span class="line">MYSQL_DATABASE=typechoasdjklk</span><br><span class="line">MYSQL_USER=lisds</span><br><span class="line">MYSQL_PASSWORD=123</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-1-2-php-fpm"><a href="#2-1-2-php-fpm" class="headerlink" title="2.1.2 php-fpm"></a>2.1.2 php-fpm</h4><p>其中 php 目录为 <code>php-fpm</code> 的 Dockerfile，在官方镜像的基础上，添加了 <code>PDO_MYSQL</code>（如果使用 MySQL 作为 Typecho 的数据库，则需安装此扩展），并设置 <code>buffer</code> 为 <code>4kb</code>，即一个内存页。同时设置了时区为<code>RPC</code>，来源于issue: <a href="https://github.com/typecho/typecho/issues/1090">https://github.com/typecho/typecho/issues/1090</a></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cd /root/data/typecho</span><br><span class="line"></span><br><span class="line">mkdir php</span><br><span class="line"></span><br><span class="line">cd php</span><br><span class="line"></span><br><span class="line">nano Dockerfile</span><br></pre></td></tr></table></figure>
+
+<p>输入下面的内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">FROM php:7.3.29-fpm</span><br><span class="line">RUN apt-get update \</span><br><span class="line">    &amp;&amp; docker-php-ext-install pdo_mysql \</span><br><span class="line">    &amp;&amp; echo &quot;output_buffering = 4096&quot; &gt; /usr/local/etc/php/conf.d/php.ini \</span><br><span class="line">    &amp;&amp; echo &quot;date.timezone = PRC&quot; &gt;&gt; /usr/local/etc/php/conf.d/php.ini</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-1-3-nginx"><a href="#2-1-3-nginx" class="headerlink" title="2.1.3 nginx"></a>2.1.3 nginx</h4><p>nginx 的配置要注意的是需要有<code>rewrite</code> 规则（后续typecho后台有一个地址重写功能），如果需要指定域名的话，需要写 <code>server_name</code> 字段。这里我并没有指定<code>443</code>端口，因为我们后面用到了反向代理。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cd /root/data/typecho</span><br><span class="line"></span><br><span class="line">mkdir nginx</span><br><span class="line"></span><br><span class="line">cd nginx</span><br><span class="line"></span><br><span class="line">nano default.conf</span><br></pre></td></tr></table></figure>
+
+<p>输入下面的内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen 80 default_server;</span><br><span class="line">    root /var/www/html;</span><br><span class="line">    index index.php;</span><br><span class="line"></span><br><span class="line">    access_log /var/log/nginx/typecho_access.log main;</span><br><span class="line">    if (!-e $request_filename) &#123;</span><br><span class="line">        rewrite ^(.*)$ /index.php$1 last;</span><br><span class="line">    &#125;</span><br><span class="line">    location / &#123;</span><br><span class="line">        index index.html index.htm index.php;</span><br><span class="line"></span><br><span class="line">        if (!-e $request_filename) &#123;</span><br><span class="line">            rewrite . /index.php last;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    location ~ \.php(.*)$ &#123;</span><br><span class="line">        fastcgi_pass   php:9000;</span><br><span class="line">        fastcgi_index  index.php;</span><br><span class="line">        fastcgi_param  PATH_TRANSLATED $document_root$fastcgi_path_info;</span><br><span class="line">        fastcgi_split_path_info  ^((?U).+\.php)(/?.+)$;</span><br><span class="line">        fastcgi_param  PATH_INFO  $fastcgi_path_info;</span><br><span class="line">        fastcgi_param  SCRIPT_NAME $fastcgi_script_name;</span><br><span class="line">        fastcgi_param  SCRIPT_FILENAME $document_root$fastcgi_script_name;</span><br><span class="line">        include        fastcgi_params;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>下载源码：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cd /root/data/typecho/typecho</span><br><span class="line"></span><br><span class="line">wget https://github.com/typecho/typecho/releases/download/v1.2.0/typecho.zip</span><br><span class="line"></span><br><span class="line">apt install zip -y </span><br><span class="line"></span><br><span class="line">unzip typecho.zip</span><br></pre></td></tr></table></figure>
+
+<p>创建<code>docker-compose</code>文件。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cd /root/data/typecho</span><br><span class="line"></span><br><span class="line">nano docker-compose.yml</span><br></pre></td></tr></table></figure>
+
+<p><code>docker-compose.yml</code>内容如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">version: &quot;3&quot;</span><br><span class="line"></span><br><span class="line">services:</span><br><span class="line">  nginx:</span><br><span class="line">    image: nginx</span><br><span class="line">    ports:</span><br><span class="line">      - &quot;9333:80&quot;    # 左边可以改成任意没使用的端口</span><br><span class="line">    restart: always</span><br><span class="line">    environment:</span><br><span class="line">      - TZ=Asia/Shanghai</span><br><span class="line">    volumes:</span><br><span class="line">      - ./typecho:/var/www/html</span><br><span class="line">      - ./nginx:/etc/nginx/conf.d</span><br><span class="line">      - ./logs:/var/log/nginx</span><br><span class="line">    depends_on:</span><br><span class="line">      - php</span><br><span class="line">    networks:</span><br><span class="line">      - web</span><br><span class="line"></span><br><span class="line">  php:</span><br><span class="line">    build: php</span><br><span class="line">    restart: always</span><br><span class="line">    expose:</span><br><span class="line">      - &quot;9000&quot;       # 不暴露公网，故没有写9000:9000</span><br><span class="line">    volumes:</span><br><span class="line">      - ./typecho:/var/www/html</span><br><span class="line">    environment:</span><br><span class="line">      - TZ=Asia/Shanghai</span><br><span class="line">    depends_on:</span><br><span class="line">      - mysql</span><br><span class="line">    networks:</span><br><span class="line">      - web</span><br><span class="line"></span><br><span class="line">  mysql:</span><br><span class="line">    image: mysql:5.7</span><br><span class="line">    restart: always</span><br><span class="line">    environment:</span><br><span class="line">      - TZ=Asia/Shanghai</span><br><span class="line">    expose:</span><br><span class="line">      - &quot;3306&quot;  # 不暴露公网，故没有写3306:3306</span><br><span class="line">    volumes:</span><br><span class="line">      - ./mysql/data:/var/lib/mysql</span><br><span class="line">      - ./mysql/logs:/var/log/mysql</span><br><span class="line">      - ./mysql/conf:/etc/mysql/conf.d</span><br><span class="line">    env_file:</span><br><span class="line">      - mysql.env</span><br><span class="line">    networks:</span><br><span class="line">      - web</span><br><span class="line"></span><br><span class="line">networks:</span><br><span class="line">  web:</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意：如果VPS的内存比较小 ，推荐设置一下SWAP，一般为内存的1-1.5倍即可～</p>
+</blockquote>
+<p>设置SWAP可以用脚本:</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">wget -O box.sh https://raw.githubusercontent.com/BlueSkyXN/SKY-BOX/main/box.sh &amp;&amp; chmod +x box.sh &amp;&amp; clear &amp;&amp; ./box.sh</span><br></pre></td></tr></table></figure>
+
+<p>没问题的话，<code>ctrl+x</code>退出，按<code>y</code>保存，<code>enter</code>确认。</p>
+<p>查看端口是否被占用，输入：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">lsof -i:9333  #查看8223端口是否被占用，如果被占用，重新自定义一个端口</span><br></pre></td></tr></table></figure>
+
+<p>如果出现：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">-bash: lsof: command not found</span><br></pre></td></tr></table></figure>
+
+<p>运行：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">apt install lsof  #安装lsof</span><br></pre></td></tr></table></figure>
+
+<p>如果端口没有被占用，可以运行：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker-compose up -d </span><br></pre></td></tr></table></figure>
+
+<p>访问：&#96;http:服务ip:9333 即可。</p>
+<blockquote>
+<p><strong>注意：</strong></p>
+<p>1、不知道服务器IP，可以直接在命令行输入：<code>curl ip.sb</code>，会显示当前服务器的IP。</p>
+<p>2、遇到访问不了的情况，请在宝塔面板的防火墙和服务商的后台防火墙里打开对应端口。</p>
+</blockquote>
+<h3 id="2-2-更新"><a href="#2-2-更新" class="headerlink" title="2.2 更新"></a>2.2 更新</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cd /root/data/typecho  # 进入docker-compose所在的文件夹</span><br><span class="line"></span><br><span class="line">docker-compose pull    # 拉取最新的镜像</span><br><span class="line"></span><br><span class="line">docker-compose up -d   # 重新更新当前镜像</span><br></pre></td></tr></table></figure>
+
+<p>利用Docker-compose搭建的应用，更新非常容易～</p>
+<h3 id="2-3-卸载"><a href="#2-3-卸载" class="headerlink" title="2.3 卸载"></a>2.3 卸载</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo -i  # 切换到root</span><br><span class="line"></span><br><span class="line">cd /root/data/typecho # 进入docker-compose所在的文件夹</span><br><span class="line"></span><br><span class="line">docker-compose down    # 停止容器，此时不会删除映射到本地的数据</span><br><span class="line"></span><br><span class="line">cd ~</span><br><span class="line"></span><br><span class="line">rm -rf /root/data/typecho  # 完全删除映射到本地的数据</span><br></pre></td></tr></table></figure>
+
+<p>利用Docker-compose搭建的应用，删除也非常容易～</p>
+<h2 id="3-反向代理"><a href="#3-反向代理" class="headerlink" title="3. 反向代理"></a>3. 反向代理</h2><h3 id="3-1-利用Nginx-Proxy-Manager"><a href="#3-1-利用Nginx-Proxy-Manager" class="headerlink" title="3.1 利用Nginx Proxy Manager"></a>3.1 利用Nginx Proxy Manager</h3><p>在添加反向代理之前，确保你已经完成了域名解析，登陆Nginx Proxy Manager</p>
+<blockquote>
+<p><strong>注意：</strong></p>
+<p>Nginx Proxy Manager（以下简称NPM）会用到<code>80</code>、<code>443</code>端口，所以本机不能占用（比如原来就有Nginx）</p>
+<p>注意填写对应的<code>域名</code>、<code>IP</code>和<code>端口</code>，按文章来的话，应该是<code>8223</code></p>
+</blockquote>
+<p><strong>IP填写：</strong></p>
+<p>如果Nginx Proxy Manager和reader在同一台服务器上，可以在终端输入：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ip addr show docker0</span><br></pre></td></tr></table></figure>
+
+<p>查看对应的Docker容器内部IP。</p>
+<p>否则直接填<code>docker所在的服务器IP</code>就行。</p>
+<p>完成之后，记得再次打开这个，把Force SSL再勾选上（小BUG）</p>
+<p>然后就可以用域名来安装访问了。</p>
+<h2 id="4-使用教程"><a href="#4-使用教程" class="headerlink" title="4. 使用教程"></a>4. 使用教程</h2><p><a href="https://img.laoda.de/i/2022/05/13/z6ntu3-0.webp"><img src="https://img.laoda.de/i/2022/05/13/z6ntu3-0.webp" alt="image-20220513212747473"></a><br><a href="https://img.laoda.de/i/2022/05/13/z6jcr6-0.webp"><img src="https://img.laoda.de/i/2022/05/13/z6jcr6-0.webp" alt="image-20220513212726407"></a></p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cd</span> /root/data/docker_data/typecho/typecho</span><br><span class="line"></span><br><span class="line">nano config.inc.php</span><br></pre></td></tr></table></figure>
+
+<p>填入上面的内容，然后点击继续安装即可。</p>
+<h3 id="4-1-地址重写功能"><a href="#4-1-地址重写功能" class="headerlink" title="4.1 地址重写功能"></a>4.1 地址重写功能</h3><p><a href="https://img.laoda.de/i/2022/05/07/yy5ted-0.webp"><img src="https://img.laoda.de/i/2022/05/07/yy5ted-0.webp" alt="image-20220507211319272"></a></p>
+]]></content>
+      <categories>
+        <category>dockers</category>
+      </categories>
+      <tags>
+        <tag>docker</tag>
+        <tag>blog</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Wiki.js搭建</title>
+    <url>/undefined/6b5f11fd/</url>
+    <content><![CDATA[<p>&#x3D;&#x3D;转载，仅供个人学习！！！&#x3D;&#x3D;</p>
+<h2 id="1-介绍"><a href="#1-介绍" class="headerlink" title="1.介绍"></a>1.介绍</h2><p>Wiki.js是一个现代化、开源的wiki应用程序，它基于Node.js构建，旨在提供强大、美观且高度可定制的知识管理解决方案。以下是Wiki.js的一些主要特点，特别是在使用Docker进行部署时的优势：</p>
+<ol>
+<li><strong>容器化部署</strong>：通过Docker部署Wiki.js，你可以享受到快速、一致且跨平台的部署体验。Docker镜像确保了运行环境的一致性，无论是Linux、macOS还是Windows系统，都能轻松启动Wiki.js，无需担心底层环境差异带来的配置问题。</li>
+<li><strong>美观的界面</strong>：Wiki.js以其优雅且用户友好的界面著称，提供了出色的阅读和编辑体验。支持Markdown编辑，让文档编写既简单又高效。</li>
+<li><strong>强大的搜索引擎</strong>：内置的全文搜索引擎确保用户能够快速找到所需的信息，提升知识库的可用性。</li>
+<li><strong>多用户与权限管理</strong>：支持多用户登录和精细的权限控制系统，可以设置不同的访问权限给不同的用户或用户组，适合团队协作和知识共享。</li>
+<li><strong>插件与扩展性</strong>：Wiki.js具有高度的可扩展性，允许通过插件系统来增加额外功能，满足特定需求，比如支持LDAP认证、备份与恢复等。</li>
+<li><strong>外部数据库支持</strong>：虽然可以使用内置的数据库解决方案，但Wiki.js还支持连接到外部的PostgreSQL、MySQL、MariaDB或MongoDB等数据库，以适应不同的部署需求和规模。</li>
+<li><strong>Markdown与富文本编辑</strong>：兼容Markdown和富文本编辑器，适应不同用户的编辑习惯，同时保持文档的结构化和易于维护。</li>
+<li><strong>版本控制与修订历史</strong>：自动跟踪文档的所有更改，用户可以查看和回滚到之前的任何一个版本，确保知识的完整性和可追溯性。</li>
+<li><strong>易于安装与升级</strong>：使用Docker部署Wiki.js，只需简单的Docker命令即可完成安装和更新过程，降低了维护成本。</li>
+<li><strong>社区支持与活跃开发</strong>：作为一个开源项目，Wiki.js拥有活跃的开发者和用户社区，持续接收贡献，修复问题并推出新功能，确保软件的稳定性和创新性。</li>
+</ol>
+<h2 id="2-项目展示"><a href="#2-项目展示" class="headerlink" title="2. 项目展示"></a>2. 项目展示</h2><p>GitHub原项目地址：<a href="https://github.com/Requarks/wiki">https://github.com/Requarks/wiki</a></p>
+<p>官网地址：<a href="https://js.wiki/">https://js.wiki/</a></p>
+<p>官方文档地址：<a href="https://docs.requarks.io/">https://docs.requarks.io/</a></p>
+<p>本教程用的镜像：<a href="https://hub.docker.com/r/linuxserver/wikijs">https://hub.docker.com/r/linuxserver/wikijs</a></p>
+<p>Demo:<a href="https://docs.requarks.io/">https://docs.requarks.io/</a></p>
+<h2 id="3-搭建环境"><a href="#3-搭建环境" class="headerlink" title="3. 搭建环境"></a>3. 搭建环境</h2><p>系统：Debian 10（DD脚本 非必需DD用原来的系统也OK）</p>
+<p>域名一枚，并做好解析到服务器上</p>
+<p>安装好Docker、Docker-compose（相关脚本）</p>
+<p>安装好Nginx Proxy Manager（相关教程）</p>
+<h2 id="4-搭建方式"><a href="#4-搭建方式" class="headerlink" title="4. 搭建方式"></a>4. 搭建方式</h2><h3 id="4-1-搭建"><a href="#4-1-搭建" class="headerlink" title="4.1 搭建"></a>4.1 搭建</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo -i # 切换到root用户</span><br><span class="line"></span><br><span class="line">apt update -y # 升级packages</span><br><span class="line"></span><br><span class="line">	apt install wget curl sudo vim git # Debian系统比较干净，安装常用的软件</span><br></pre></td></tr></table></figure>
+
+<hr>
+<p>创建一下安装的目录：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mkdir -p /root/data/docker_data/wikijs</span><br><span class="line"></span><br><span class="line">cd /root/data/docker_data/wikijs</span><br><span class="line"></span><br><span class="line">vim docker-compose.yml</span><br></pre></td></tr></table></figure>
+
+<p>docker-compose.yml填入以下内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">version: &quot;2.1&quot;</span><br><span class="line">services:</span><br><span class="line">  wikijs:</span><br><span class="line">    image: lscr.io/linuxserver/wikijs</span><br><span class="line">    container_name: wikijs</span><br><span class="line">    environment:</span><br><span class="line">      - PUID=1000        # 如何查看当前用户的PUID和PGID，直接命令行输入id就行</span><br><span class="line">      - PGID=1000</span><br><span class="line">      - TZ=Asia/Shanghai</span><br><span class="line">    volumes:</span><br><span class="line">      - /root/data/docker_data/wikijs/config:/config  # 配置文件映射到本地，数据不会因为Docker停止而丢失</span><br><span class="line">      - /root/data/docker_data/wikijs/data:/data  # 数据映射到本地，数据不会因为Docker停止而丢失</span><br><span class="line">    ports:</span><br><span class="line">      - 8080:3000   # 左边的8080可以自己调整端口号，右边的3000不要改</span><br><span class="line">    restart: unless-stopped</span><br></pre></td></tr></table></figure>
+
+<hr>
+<p>没问题的话，ctrl+x退出，按y保存，enter确认。</p>
+<p>然后运行：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker-compose up -d</span><br></pre></td></tr></table></figure>
+
+<p>访问：&#x3D;&#x3D;http:服务ip:8080 即可。&#x3D;&#x3D;</p>
+<hr>
+<p>注意：</p>
+<p>1、不知道服务器IP，可以直接在命令行输入：curl <a href="http://ip.sb/">ip.sb</a>，会显示当前服务器的IP。</p>
+<p>2、遇到访问不了的情况，请在宝塔面板的防火墙和服务商的后台防火墙里打开对应端口。</p>
+<hr>
+<h3 id="4-2-更新"><a href="#4-2-更新" class="headerlink" title="4.2 更新"></a>4.2 更新</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cp -r /root/data/docker_data/wikijs /root/data/docker_data/wikijs.archive # 万事先备份，以防万一</span><br><span class="line"></span><br><span class="line">cd /root/data/docker_data/wikijs # 进入docker-compose所在的文件夹</span><br><span class="line"></span><br><span class="line">docker-compose pull # 拉取最新的镜像</span><br><span class="line"></span><br><span class="line">docker-compose up -d # 重新更新当前镜像</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+</blockquote>
+<p>利用Docker-compose搭建的应用，更新非常容易～</p>
+<hr>
+<h3 id="4-3-卸载"><a href="#4-3-卸载" class="headerlink" title="4.3 卸载"></a>4.3 卸载</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cd /root/data/docker_data/wikijs # 进入docker-compose所在的文件夹</span><br><span class="line"></span><br><span class="line">docker-compose down # 停止容器，此时不会删除映射到本地的数据</span><br><span class="line"></span><br><span class="line">rm -rf /root/data/docker_data/wikijs # 完全删除映射到本地的数据</span><br></pre></td></tr></table></figure>
+
+<p>此时，执行：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ls -al</span><br></pre></td></tr></table></figure>
+
+<p>可以看到三个文件夹，config、 data、 docker-compose.yml</p>
+<hr>
+<p>如果想要删除配置文件和数据，重新搭建的话，执行：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">rm -rf config/</span><br><span class="line"></span><br><span class="line">rm -rf data/</span><br></pre></td></tr></table></figure>
+
+<p>如果想要全部删除的话，执行：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cd .. # 退回到/root/data/docker_data目录</span><br><span class="line"></span><br><span class="line">rm -rf /root/data/docker_data/wikijs # 完全删除映射到本地的数据</span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>dockers</category>
+      </categories>
+      <tags>
+        <tag>docker</tag>
+        <tag>wikijs</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>wordpress博客搭建</title>
+    <url>/undefined/e779e2ee/</url>
+    <content><![CDATA[<p>WordPress是一个广泛使用的开源内容管理系统（CMS），它最初以博客平台为人所知，但现在已经发展成为一个功能丰富的网站构建平台，适用于从个人博客到企业级网站的多种用途。当与Docker结合使用时，WordPress的特点和优势更加明显，具体包括：</p>
+<ol>
+<li><strong>快速部署与标准化</strong>：通过Docker部署WordPress，你可以利用预配置的Docker镜像快速启动环境，如<code>wordpress:latest</code>镜像包含了运行WordPress所需的一切，包括PHP和Web服务器。这样，无论在何处部署，都能确保环境的一致性。</li>
+<li><strong>环境隔离</strong>：Docker容器化技术确保了WordPress及其依赖（如MySQL数据库）运行在一个隔离的环境中，不会影响宿主机上的其他服务或应用，提高了系统的稳定性和安全性。</li>
+<li><strong>资源管理</strong>：Docker允许你为WordPress容器设定资源限制，如CPU和内存使用，有助于优化资源分配，尤其是在多应用共存的服务器上。</li>
+<li><strong>灵活的架构</strong>：使用Docker Compose，可以轻松定义并部署WordPress及其关联服务（如数据库、缓存服务等）的整个堆栈，所有服务通过配置文件定义，易于管理和调整。</li>
+<li><strong>易扩展与维护</strong>：WordPress的Docker化使得添加新的插件、主题或更新核心变得简单直接，可以通过更新Docker镜像或重新构建容器来实现，而不需要手动在服务器上操作。</li>
+<li><strong>数据持久化</strong>：虽然WordPress容器本身是临时的，但通过Docker卷或绑定宿主机目录，可以持久化存储网站内容、插件、主题以及数据库数据，确保数据不丢失。</li>
+<li><strong>协同工作与CI&#x2F;CD集成</strong>：Docker化使得WordPress项目更易于团队成员之间的共享和协作，同时也方便集成到持续集成和持续部署（CI&#x2F;CD）流程中，自动化测试和部署。</li>
+<li><strong>安全性增强</strong>：通过Docker网络配置，可以限制WordPress容器的网络访问，进一步提升系统的安全性。同时，定期更新Docker镜像有助于应用安全性的维护。</li>
+</ol>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mkdir -p /root/data/docker_data/wordpress </span><br><span class="line">cd /root/data/docker_data/wordpress </span><br><span class="line">nano docker-compose.yml</span><br></pre></td></tr></table></figure>
+<p>docker-compose.yml填入以下内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">version: &#x27;3.1&#x27;</span><br><span class="line"></span><br><span class="line">services:</span><br><span class="line"></span><br><span class="line">  wordpress:</span><br><span class="line">    image: wordpress</span><br><span class="line">    restart: always</span><br><span class="line">    ports:</span><br><span class="line">      - 8080:80   # 左边的8080可以自己调整端口号，右边的3000不要改</span><br><span class="line">    environment:</span><br><span class="line">      WORDPRESS_DB_HOST: db</span><br><span class="line">      WORDPRESS_DB_USER: exampleuser</span><br><span class="line">      WORDPRESS_DB_PASSWORD: examplepass</span><br><span class="line">      WORDPRESS_DB_NAME: exampledb</span><br><span class="line">    volumes:</span><br><span class="line">      - /root/data/docker_data/wordpress/data:/var/www/html</span><br><span class="line"></span><br><span class="line">  db:</span><br><span class="line">    image: mysql:5.7</span><br><span class="line">    restart: always</span><br><span class="line">    environment:</span><br><span class="line">      MYSQL_DATABASE: exampledb</span><br><span class="line">      MYSQL_USER: exampleuser</span><br><span class="line">      MYSQL_PASSWORD: examplepass</span><br><span class="line">      MYSQL_RANDOM_ROOT_PASSWORD: &#x27;1&#x27;</span><br><span class="line">    volumes:</span><br><span class="line">      - /root/data/docker_data/wordpress/db:/var/lib/mysql</span><br><span class="line"></span><br><span class="line">#volumes:</span><br><span class="line">#  wordpress:</span><br><span class="line">#  db:</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker-compose up -d</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="卸载"><a href="#卸载" class="headerlink" title="卸载"></a>卸载</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cd /root/data/docker_data/wordpress  # 进入docker-compose所在的文件夹</span><br><span class="line"></span><br><span class="line">docker-compose down # 停止容器，此时不会删除映射到本地的数据</span><br><span class="line"></span><br><span class="line">rm -rf /root/data/docker_data/wordpress  # 完全删除映射到本地的数据</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>dockers</category>
+      </categories>
+      <tags>
+        <tag>docker</tag>
+        <tag>website</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>nextcloud搭建</title>
+    <url>/undefined/8093261a/</url>
+    <content><![CDATA[<p>Nextcloud是一款开源的云存储和文件共享平台，通过Docker部署Nextcloud，其特点简述如下：</p>
+<ol>
+<li><strong>快速部署与可移植性</strong>：Docker化使Nextcloud部署变得快捷简便，几条命令即可启动服务，同时确保跨环境一致性。</li>
+<li><strong>环境隔离与资源优化</strong>：容器化运行保证了Nextcloud运行环境的隔离性，易于资源管理和限制，提高系统安全性。</li>
+<li><strong>数据持久化</strong>：结合Docker卷，用户数据和配置可持久保存，确保升级或迁移时数据不丢失。</li>
+<li><strong>弹性扩展与集成</strong>：易于与其他Docker服务（如MySQL数据库）集成，支持通过Docker Compose搭建完整生态系统，按需扩展功能。</li>
+<li><strong>安全更新与维护</strong>：利用Docker镜像更新，轻松实现Nextcloud及其依赖的升级，保持系统最新且安全。</li>
+<li><strong>社区支持</strong>：得益于开源社区，Nextcloud在Docker上的应用拥有丰富的文档和用户支持，便于故障排查和定制化。</li>
+</ol>
+<p>创建一下安装的目录：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo -i</span><br><span class="line"></span><br><span class="line"><span class="built_in">mkdir</span> -p /root/data/aio-nextcloud</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> /root/data/aio-nextcloud</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">vim docker-compose.yml</span><br></pre></td></tr></table></figure>
+
+<p>以下是咕咕修改的，可以看看有啥不一样（具体见视频）</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">version: &quot;3.8&quot;</span><br><span class="line"></span><br><span class="line">volumes:</span><br><span class="line"> nextcloud_aio_mastercontainer:</span><br><span class="line">   name: nextcloud_aio_mastercontainer</span><br><span class="line">services:</span><br><span class="line"> nextcloud:</span><br><span class="line">   image: nextcloud/all-in-one:latest</span><br><span class="line">   restart: unless-stopped</span><br><span class="line">   container_name: nextcloud-aio-mastercontainer</span><br><span class="line">   volumes:</span><br><span class="line">     - nextcloud_aio_mastercontainer:/mnt/docker-aio-config</span><br><span class="line">     - /var/run/docker.sock:/var/run/docker.sock:ro</span><br><span class="line">   ports:</span><br><span class="line">     - 7070:8080 # change the port on the left side if it&#x27;s already in use on your host system.</span><br><span class="line">   environment:</span><br><span class="line">     - APACHE_PORT=11000  # change this port number if 11000 is already in use on your host system.</span><br><span class="line">     - APACHE_DISABLE_REWRITE_IP=1</span><br><span class="line">     - NEXTCLOUD_TRUSTED_DOMAINS=pan.gugu.ovh 31.22.109.18 # Your domain name + proxy host IP</span><br><span class="line">     - TRUSTED_PROXIES=31.22.109.18 # proxy host IP</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>dockers</category>
+      </categories>
+      <tags>
+        <tag>docker</tag>
+        <tag>cloud storage</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>基于docker搭建监控系统&amp;日志收集</title>
+    <url>/undefined/3b7989e0/</url>
+    <content><![CDATA[<h2 id="什么是Prometheus"><a href="#什么是Prometheus" class="headerlink" title="什么是Prometheus?"></a><strong>什么是Prometheus?</strong></h2><p>Prometheus是由SoundCloud开发的开源监控报警系统和时序列数据库(TSDB)。Prometheus使用Go语言开发，是Google BorgMon监控系统的开源版本。<br>2016年由Google发起Linux基金会旗下的原生云基金会(Cloud Native Computing Foundation), 将Prometheus纳入其下第二大开源项目。<br>Prometheus目前在开源社区相当活跃。<br>Prometheus和Heapster(Heapster是K8S的一个子项目，用于获取集群的性能数据。)相比功能更完善、更全面。Prometheus性能也足够支撑上万台规模的集群。</p>
+<p><strong>Prometheus的特点</strong></p>
+<ul>
+<li>多维度数据模型。</li>
+<li>灵活的查询语言。</li>
+<li>不依赖分布式存储，单个服务器节点是自主的。</li>
+<li>通过基于HTTP的pull方式采集时序数据。</li>
+<li>可以通过中间网关进行时序列数据推送。</li>
+<li>通过服务发现或者静态配置来发现目标服务对象。</li>
+<li>支持多种多样的图表和界面展示，比如Grafana等。<br><strong>监控系统架构图</strong></li>
+</ul>
+<p><img src="https://pic2.zhimg.com/80/v2-c4fda4a89b8a7d3006a5bd522bab04f9_720w.webp"></p>
+<h2 id="拉取镜像"><a href="#拉取镜像" class="headerlink" title="拉取镜像"></a><strong>拉取镜像</strong></h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker pull prom/node-exporter</span><br><span class="line">docker pull prom/prometheus</span><br><span class="line">docker pull grafana/grafana       </span><br></pre></td></tr></table></figure>
+
+<p><strong>启动node-exporter</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker run -d -p 9100:9100 \</span><br><span class="line">  -v &quot;/proc:/host/proc:ro&quot; \</span><br><span class="line">  -v &quot;/sys:/host/sys:ro&quot; \</span><br><span class="line">  -v &quot;/:/rootfs:ro&quot; \</span><br><span class="line">  --net=&quot;host&quot; \</span><br><span class="line">  prom/node-exporter</span><br></pre></td></tr></table></figure>
+
+<p>访问<a href="https://link.zhihu.com/?target=http://ip:9100/metrics">http://ip:9100/metrics</a><br><strong>启动prometheus</strong></p>
+<p>新建目录prometheus，编辑配置文件prometheus.yml</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mkdir /opt/prometheus</span><br><span class="line">cd /opt/prometheus/</span><br><span class="line">vi prometheus.yml</span><br></pre></td></tr></table></figure>
+
+
+
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">global:</span><br><span class="line">  scrape_interval:     60s</span><br><span class="line">  evaluation_interval: 60s</span><br><span class="line"> </span><br><span class="line">scrape_configs:</span><br><span class="line">  - job_name: prometheus</span><br><span class="line">    static_configs:</span><br><span class="line">      - targets: [&#x27;96.8.121.168:9090&#x27;]</span><br><span class="line">        labels:</span><br><span class="line">          instance: prometheus</span><br><span class="line"> </span><br><span class="line">  - job_name: linux</span><br><span class="line">    static_configs:</span><br><span class="line">      - targets: [&#x27;96.8.121.168:9100&#x27;]</span><br><span class="line">        labels:</span><br><span class="line">          instance: 96.8.121.168</span><br></pre></td></tr></table></figure>
+
+<p>注意：修改IP地址，这里的ip就是本机地址</p>
+<p><strong>启动prometheus</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker run  -d \</span><br><span class="line">  -p 10050:9090 \</span><br><span class="line">  -v /opt/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml  \</span><br><span class="line">  prom/prometheus</span><br></pre></td></tr></table></figure>
+
+
+
+
+<p>等待几秒查询端口状态</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">netstat -anpt</span><br></pre></td></tr></table></figure>
+
+<p>访问url</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">http://ip:10050/graph</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://pic3.zhimg.com/80/v2-10470180ee63b26709a88bf86500cb5a_720w.webp"></p>
+<p>访问targets，url如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">http://ip:10050/targets               </span><br></pre></td></tr></table></figure>
+
+<p><img src="https://pic4.zhimg.com/80/v2-6e9b8fe9a29b46f3fb6fed1c756ca817_720w.webp"></p>
+<p><strong>启动grafana</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker run -d \</span><br><span class="line">-p 10051:3000 \</span><br><span class="line">--name=grafana \</span><br><span class="line">-e &quot;GF_SERVER_ROOT_URL=http://grafana.server.name&quot; \</span><br><span class="line">-e &quot;GF_SECURITY_ADMIN_PASSWORD=admin&quot; \</span><br><span class="line">grafana/grafana</span><br></pre></td></tr></table></figure>
+
+<p>访问首页</p>
+<p><a href="https://link.zhihu.com/?target=http://ip:10051/">http://ip:10051</a> admin admin</p>
+<p><img src="https://pic1.zhimg.com/80/v2-c2b7545a4acc4b583bca9fd3fca1d670_720w.webp"></p>
+<p>添加数据源</p>
+<p><img src="https://pic2.zhimg.com/80/v2-63aa46998d5176c434d3a443f1f3fad9_720w.webp"></p>
+<p><img src="https://pic3.zhimg.com/80/v2-1f124d2de0b7cf434cd8b51f3f4ed46e_720w.webp"></p>
+<p><strong>监测服务器负载配置</strong></p>
+<p>create-&gt;import填入8919模板引擎，选择prometheus数据源，就能加载出服务器负载到主页</p>
+<p><img src="https://pic1.zhimg.com/80/v2-8967bb5016ade21638fe604715482c5c_720w.webp"></p>
+<p>监控主页</p>
+<p><img src="https://pic2.zhimg.com/80/v2-56858eb5242d9310236663e1396c34e9_720w.webp"></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">global:</span><br><span class="line">  scrape_interval:     60s</span><br><span class="line">  evaluation_interval: 60s</span><br><span class="line"></span><br><span class="line">scrape_configs:</span><br><span class="line"></span><br><span class="line">  - job_name: prometheus</span><br><span class="line">    static_configs:</span><br><span class="line">      - targets: [&#x27;localhost:9090&#x27;]</span><br><span class="line">        labels:</span><br><span class="line">          instance: prometheus</span><br><span class="line"></span><br><span class="line">  - job_name: linux</span><br><span class="line">    static_configs:</span><br><span class="line">      - targets: [&#x27;96.8.121.168:9100&#x27;]</span><br><span class="line">        labels:</span><br><span class="line">          instance: localhost</span><br><span class="line">   #  - targets: [&#x27;ip:9100&#x27;]  </span><br><span class="line">   #这里添加targets，可以使用Prometheus监控其他装有node_exporter的节点，单节点则不需要</span><br><span class="line">   #    labels:</span><br><span class="line">   #      instance: 192.168.1.22</span><br><span class="line"></span><br><span class="line">  - job_name: cadvisor</span><br><span class="line">    static_configs:</span><br><span class="line">      - targets: [&#x27;172.17.0.6:8080&#x27;]</span><br><span class="line">        labels:</span><br><span class="line">          instance: cAdvisor</span><br><span class="line"></span><br><span class="line">  - job_name: mysqld</span><br><span class="line">    static_configs:</span><br><span class="line">      - targets: [&#x27;96.8.121.168:9104&#x27;]</span><br><span class="line">        labels:</span><br><span class="line">          instance: mysql-exporter</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>注意：修改IP地址，这里的172.17.0. xx就是docker容器内的私网，需要自行查询:<code>:</code></p>
+]]></content>
+      <categories>
+        <category>dockers</category>
+      </categories>
+      <tags>
+        <tag>docker</tag>
+        <tag>监控</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>uptime 网站监控搭建</title>
+    <url>/undefined/2023caab/</url>
+    <content><![CDATA[<p>Uptime Kuma是一款开源的监控工具，通过Docker部署时，其特点包括：</p>
+<ol>
+<li><strong>快速部署与维护简便</strong>：Docker化部署，快捷启动，易于维护和升级。</li>
+<li><strong>站点健康监控</strong>：定期检查网站、服务可用性，支持HTTP(s)、TCP、ICMP等多种协议。</li>
+<li><strong>告警通知</strong>：可配置告警，通过邮件、Telegram等渠道发送服务中断通知。</li>
+<li><strong>自定义检查</strong>：支持根据需求配置自定义检查规则，如特定端口、内容监测。</li>
+<li><strong>数据私密与安全</strong>：自托管保证数据私密，且支持多语言界面。</li>
+<li><strong>容器化优势</strong>：环境一致性保障，资源高效利用，易于扩展与集成其他Docker服务。</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mkdir -p /root/data/docker_data/uptime </span><br><span class="line">cd /root/data/docker_data/uptime </span><br><span class="line">nano docker-compose.yml</span><br></pre></td></tr></table></figure>
+
+
+<p>docker-compose.yml填入以下内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">version: &#x27;3.3&#x27;</span><br><span class="line"></span><br><span class="line">services:</span><br><span class="line">  uptime-kuma:</span><br><span class="line">    image: louislam/uptime-kuma</span><br><span class="line">    container_name: uptime-kuma</span><br><span class="line">    volumes:</span><br><span class="line">      - ./uptime-kuma:/app/data</span><br><span class="line">    ports:</span><br><span class="line">      - 3001:3001     # 左边的3001可以自己调整端口号，右边的3000不要改</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker-compose up -d</span><br></pre></td></tr></table></figure>
+<p><img src="https://picgo-1321316737.cos.ap-guangzhou.myqcloud.com/img/20240513144714.png"></p>
+]]></content>
+      <categories>
+        <category>dockers</category>
+      </categories>
+      <tags>
+        <tag>docker</tag>
+        <tag>监控</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>网站流量统计工具 -Plausible</title>
+    <url>/undefined/a0a38a3f/</url>
+    <content><![CDATA[<p>Plausible是一款轻量级、开源的网页分析工具，通过Docker部署时，其核心特点包括：</p>
+<ol>
+<li><strong>隐私优先</strong>：注重用户隐私，不使用cookies，遵守GDPR和CMPA标准。</li>
+<li><strong>轻量化</strong>：对网站性能影响小，加载速度快，无第三方跟踪。</li>
+<li><strong>易于部署</strong>：借助Docker，快速启动和配置，实现无缝部署。</li>
+<li><strong>数据实时</strong>：提供实时访客统计，即时洞察网站流量动态。</li>
+<li><strong>自托管</strong>：数据由用户自己掌控，增强数据安全与自主性。</li>
+<li><strong>界面直观</strong>：简洁的仪表板展示关键指标，便于数据分析。</li>
+</ol>
+<p>创建一下安装的目录：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mkdir -p /root/data/docker_data/plausible</span><br><span class="line"></span><br><span class="line">cd /root/data/docker_data/plausible</span><br><span class="line"></span><br><span class="line">git clone https://github.com/plausible/hosting</span><br><span class="line"></span><br><span class="line">cd hosting</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">vim docker-compose.yml</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">version: &quot;3.3&quot;</span><br><span class="line">services:</span><br><span class="line">  mail:</span><br><span class="line">    image: bytemark/smtp</span><br><span class="line">    restart: always</span><br><span class="line"></span><br><span class="line">  plausible_db:</span><br><span class="line">    # supported versions are 12, 13, and 14</span><br><span class="line">    image: postgres:14-alpine</span><br><span class="line">    restart: always</span><br><span class="line">    volumes:</span><br><span class="line">      - ./db-data:/var/lib/postgresql/data</span><br><span class="line">    environment:</span><br><span class="line">      - POSTGRES_PASSWORD=postgres</span><br><span class="line"></span><br><span class="line">  plausible_events_db:</span><br><span class="line">    image: clickhouse/clickhouse-server:23.3.7.5-alpine</span><br><span class="line">    restart: always</span><br><span class="line">    volumes:</span><br><span class="line">      - ./event-data:/var/lib/clickhouse</span><br><span class="line">      - ./clickhouse/clickhouse-config.xml:/etc/clickhouse-server/config.d/logging.xml:ro</span><br><span class="line">      - ./clickhouse/clickhouse-user-config.xml:/etc/clickhouse-server/users.d/logging.xml:ro</span><br><span class="line">    ulimits:</span><br><span class="line">      nofile:</span><br><span class="line">        soft: 262144</span><br><span class="line">        hard: 262144</span><br><span class="line"></span><br><span class="line">  plausible:</span><br><span class="line">    image: plausible/analytics:v2.0</span><br><span class="line">    restart: always</span><br><span class="line">    command: sh -c &quot;sleep 10 &amp;&amp; /entrypoint.sh db createdb &amp;&amp; /entrypoint.sh db migrate &amp;&amp; /entrypoint.sh run&quot;</span><br><span class="line">    depends_on:</span><br><span class="line">      - plausible_db</span><br><span class="line">      - plausible_events_db</span><br><span class="line">      - mail</span><br><span class="line">    ports:</span><br><span class="line">      - 8080:8000     # 左边端口号随便改</span><br><span class="line">    env_file:</span><br><span class="line">      - plausible-conf.env</span><br></pre></td></tr></table></figure>
+
+<p>生成密钥：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">openssl rand -base64 64 | tr -d &#x27;\n&#x27; ; echo</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">vim plausible-conf.env</span><br></pre></td></tr></table></figure>
+
+
+<p>BASE_URL&#x3D;<a href="https://xxxxxxxxxxx/">https://xxxxxxxxxxx</a><br>(密钥)SECRET_KEY_BASE&#x3D;xxxxxxxxxxxxxxxxxxxxxx</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker-compose up -d</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+]]></content>
+      <categories>
+        <category>dockers</category>
+      </categories>
+      <tags>
+        <tag>docker</tag>
+        <tag>监控</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>整理一些常用的脚本</title>
+    <url>/undefined/91208508/</url>
+    <content><![CDATA[<h2 id="更新列表"><a href="#更新列表" class="headerlink" title="更新列表"></a>更新列表</h2><p>2023-0525 检测是否可以访问ChatGPT<a href="https://iwanlab.com/tag/%e8%84%9a%e6%9c%ac/" title="脚本">脚本</a> <a href="https://github.com/moeakwak/chatgpt-web-share/wiki/%E4%B8%AD%E6%96%87%E6%8C%87%E5%8D%97">来源</a></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">bash &lt;(curl -Ls https://raw.githubusercontent.com/missuo/OpenAI-Checker/main/openai.sh)</span><br></pre></td></tr></table></figure>
+
+<p>2023-4-29 修改检测是否可以访问ChatGPT脚本</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">bash &lt;(curl -Ls https://ourl.co/oaic)</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">bash &lt;(curl -Ls https://cdn.jsdelivr.net/gh/missuo/OpenAI-Checker/openai.sh)</span><br></pre></td></tr></table></figure>
+
+<h2 id="设置SWAP可以用脚本"><a href="#设置SWAP可以用脚本" class="headerlink" title="设置SWAP可以用脚本"></a>设置SWAP可以用脚本</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">wget -O box.sh https://raw.githubusercontent.com/BlueSkyXN/SKY-BOX/main/box.sh &amp;&amp; chmod +x box.sh &amp;&amp; clear &amp;&amp; ./box.sh</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="综合工具箱（强烈推荐，集成了很多脚本）"><a href="#综合工具箱（强烈推荐，集成了很多脚本）" class="headerlink" title="综合工具箱（强烈推荐，集成了很多脚本）"></a>综合工具箱（强烈推荐，集成了很多脚本）</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">wget -O box.sh https://raw.githubusercontent.com/BlueSkyXN/SKY-BOX/main/box.sh &amp;&amp; chmod +x box.sh &amp;&amp; clear &amp;&amp; ./box.sh</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="杜甫测试"><a href="#杜甫测试" class="headerlink" title="杜甫测试"></a>杜甫测试</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">wget -q https://github.com/Aniverse/A/raw/i/a &amp;&amp; bash a</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="DD相关"><a href="#DD相关" class="headerlink" title="DD相关"></a>DD相关</h2><h3 id="1、甲骨文DD脚本"><a href="#1、甲骨文DD脚本" class="headerlink" title="1、甲骨文DD脚本"></a>1、甲骨文DD脚本</h3><p>DD成Debian 10</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">bash &lt;(wget --no-check-certificate -qO- &#x27;https://raw.githubusercontent.com/MoeClub/Note/master/InstallNET.sh&#x27;) -d 10 -v 64 -p &quot;自定义root密码&quot; -port &quot;自定义ssh端口&quot;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>DD成Ubuntu 20.04</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">bash &lt;(wget --no-check-certificate -qO- &#x27;https://raw.githubusercontent.com/MoeClub/Note/master/InstallNET.sh&#x27;) -u 20.04 -v 64 -p &quot;自定义root密码&quot; -port &quot;自定义ssh端口&quot;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="2、MoeClub脚本"><a href="#2、MoeClub脚本" class="headerlink" title="2、MoeClub脚本"></a>2、MoeClub脚本</h3><p><strong>重点推荐</strong>：</p>
+<p>时间：22&#x2F;11&#x2F;2021 15:21 萌咖更新脚本：</p>
+<p>1.新增对 Oracle AMD，Oracle ARM全面支持. 可支持从 Ubuntu, Oracle Linux 等系统网络重装.<br>2.更新 dd 镜像的基础系统版本.<br>3.移除对外部 wget 的依赖.<br>4.新增 -port 参数, 可更改默认SSH端口.<br>5.更新 内置的网络参数计算 逻辑.<br>6.更新 grub 配置文件定位逻辑, 可支持任意引导grub的系统.</p>
+<p>以下系统已通过测试(其他自测):<br>Debian: 9, 10, 11;<br>Ubuntu: 18.04, 20.04;<br>CentOS: 6.10;<br>以下平台已通过测试(其他自测):<br>Oracle、Do、Azure</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">bash &lt;(wget --no-check-certificate -qO- &#x27;https://raw.githubusercontent.com/MoeClub/Note/master/InstallNET.sh&#x27;) -d 10 -v 64 -p &quot;自定义root密码&quot; -port &quot;自定义ssh端口&quot;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>-d 10 -v 64<br>-d 9 -v 64<br>-u 20.04 -v 64<br>-u 18.04 -v 64</p>
+<p>开机改密码脚本：</p>
+<p>开机改密：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#!/bin/bash</span><br><span class="line">echo root:Vicer |sudo chpasswd root</span><br><span class="line">sudo sed -i &#x27;s/^#\?PermitRootLogin.*/PermitRootLogin yes/g&#x27; /etc/ssh/sshd_config;</span><br><span class="line">sudo sed -i &#x27;s/^#\?PasswordAuthentication.*/PasswordAuthentication yes/g&#x27; /etc/ssh/sshd_config;</span><br><span class="line">sudo reboot</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="3、另一位大佬的脚本"><a href="#3、另一位大佬的脚本" class="headerlink" title="3、另一位大佬的脚本"></a>3、另一位大佬的脚本</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">wget --no-check-certificate -O AutoReinstall.sh https://git.io/AutoReinstall.sh &amp;&amp; bash AutoReinstall.sh</span><br></pre></td></tr></table></figure>
+
+
+
+<ul>
+<li><p>CentOS默认密码Pwd@CentOS 其它系统Pwd@Linux</p>
+</li>
+<li><p>OpenVZ &#x2F; LXC 架构系统不适用</p>
+</li>
+</ul>
+<p>来源：<a href="https://blog.hicasper.com/post/135.html">https://blog.hicasper.com/post/135.html</a> 参考：<a href="https://www.ydyno.com/archives/1245.html">https://www.ydyno.com/archives/1245.html</a> 感谢大佬的付出！</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">bash &lt;(wget --no-check-certificate -qO- &#x27;https://file.geekn.net/CNODnjau/InstallNET.sh&#x27;) -d 11 -v 64 -a -firmware</span><br></pre></td></tr></table></figure>
+
+
+
+<p>-firmware 额外的驱动支持<br>-d 后面是系统版本号<br>-v 后面写64位 32位<br>-a （不清楚这个干啥的但是每个脚本都带）<br>–mirror 后面是镜像源地址</p>
+<p>-p 后面写自定义密码</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">镜像站地址</span><br><span class="line">官方给出的地址列表：https://www.debian.org/mirror/list</span><br><span class="line"></span><br><span class="line">一些国内的</span><br><span class="line">ftp.cn.debian.org</span><br><span class="line">mirror.bjtu.edu.cn</span><br><span class="line">mirror.lzu.edu.cn        </span><br><span class="line">mirror.nju.edu.cn        </span><br><span class="line">mirrors.163.com        </span><br><span class="line">mirrors.bfsu.edu.cn        </span><br><span class="line">mirrors.hit.edu.cn        </span><br><span class="line">mirrors.huaweicloud.com        </span><br><span class="line">mirror.sjtu.edu.cn        </span><br><span class="line">mirrors.tuna.tsinghua.edu.cn        </span><br><span class="line">mirrors.ustc.edu.cn        </span><br><span class="line"></span><br><span class="line">使用方法：（大致都是一样的）</span><br><span class="line"></span><br><span class="line">清华源</span><br><span class="line">--mirror &#x27;https://mirrors.ustc.edu.cn/debian/&#x27;</span><br><span class="line"></span><br><span class="line">腾讯源</span><br><span class="line">--mirror &#x27;https://mirrors.aliyun.com/debian/&#x27;</span><br><span class="line"></span><br><span class="line">阿里源</span><br><span class="line">--mirror &#x27;https://mirrors.aliyun.com/debian/&#x27;</span><br><span class="line"></span><br><span class="line">华为源</span><br><span class="line">--mirror &#x27;https://mirrors.huaweicloud.com/debian/&#x27;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="4、秋水逸冰-Windows-2012-2016-2019-2022-10-11-DD-镜像"><a href="#4、秋水逸冰-Windows-2012-2016-2019-2022-10-11-DD-镜像" class="headerlink" title="4、秋水逸冰 Windows 2012&#x2F;2016&#x2F;2019&#x2F;2022 10&#x2F;11 DD 镜像"></a>4、秋水逸冰 Windows 2012&#x2F;2016&#x2F;2019&#x2F;2022 10&#x2F;11 DD 镜像</h3><p>适用于 UEFI 启动的多个 Windows 系统 DD 镜像：</p>
+<p><a href="https://teddysun.com/656.html">https://teddysun.com/656.html</a></p>
+<p>分别是：</p>
+<ol>
+<li>Windows Server 2012 R2 Datacenter</li>
+<li>Windows Server 2016 Datacenter (build: 14393.5006)</li>
+<li>Windows Server 2019 Datacenter (build: 17763.2686)</li>
+<li>Windows Server 2022 Datacenter (build: 20348.587)</li>
+<li>Windows 10 Enterprise LTSC (build: 19044.1288)</li>
+<li>Windows 11 Pro for Workstations 21H2 (build: 22000.194)</li>
+</ol>
+<p>适用于 BIOS 启动的 Windows Server 2022 Datacenter DD 镜像：</p>
+<p><a href="https://teddysun.com/629.html">https://teddysun.com/629.html</a></p>
+<p>适用于 BIOS 启动的 Windows 11 Pro for Workstations 21H2 DD 镜像：</p>
+<p><a href="https://teddysun.com/642.html">https://teddysun.com/642.html</a></p>
+<p>适用于 BIOS 启动的 Windows 10 Enterprise LTSC DD 镜像：</p>
+<p><a href="https://teddysun.com/640.html">https://teddysun.com/640.html</a></p>
+<p>适用于 BIOS 启动的 Windows Server 2019&#x2F;2016&#x2F;2012R2 Datacenter DD 镜像：</p>
+<p><a href="https://teddysun.com/545.html">https://teddysun.com/545.html</a></p>
+<p>分别是：</p>
+<ol>
+<li>Windows Server 2019 Datacenter（Build: 17763.2686）</li>
+<li>Windows Server 2016 Datacenter（Build: 14393.5006）</li>
+<li>Windows Server 2012 R2 Datacenter</li>
+</ol>
+<h2 id="测试相关"><a href="#测试相关" class="headerlink" title="测试相关"></a>测试相关</h2><h3 id="机器测试"><a href="#机器测试" class="headerlink" title="机器测试"></a>机器测试</h3><h4 id="单线程测试"><a href="#单线程测试" class="headerlink" title="单线程测试"></a>单线程测试</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">bash &lt;(curl -Lso- https://bench.im/hyperspeed)</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="最全测速脚本"><a href="#最全测速脚本" class="headerlink" title="最全测速脚本"></a>最全<a href="https://iwanlab.com/tag/%e6%b5%8b%e9%80%9f/" title="测速">测速</a>脚本</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">curl -fsL https://ilemonra.in/LemonBenchIntl | bash -s fast</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="superbench"><a href="#superbench" class="headerlink" title="superbench"></a>superbench</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">wget -qO- git.io/superbench.sh | bash</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="Bench-sh"><a href="#Bench-sh" class="headerlink" title="Bench.sh"></a>Bench.sh</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">wget -qO- bench.sh | bash</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="速度测试"><a href="#速度测试" class="headerlink" title="速度测试"></a>速度测试</h3><h4 id="显示延迟、抖动"><a href="#显示延迟、抖动" class="headerlink" title="显示延迟、抖动"></a>显示延迟、抖动</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">bash &lt;(wget -qO- https://bench.im/hyperspeed)</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="直接显示回程线路"><a href="#直接显示回程线路" class="headerlink" title="直接显示回程线路"></a>直接显示回程线路</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">curl https://raw.githubusercontent.com/zhucaidan/mtr_trace/main/mtr_trace.sh|bash</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">wget -q route.f2k.pub -O route &amp;&amp; bash route</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># 第一个</span><br><span class="line">wget https://raw.githubusercontent.com/nanqinlang-script/testrace/master/testrace.sh</span><br><span class="line">bash testrace.sh</span><br><span class="line"></span><br><span class="line"># 第二个</span><br><span class="line">wget -qO- git.io/besttrace | bash</span><br></pre></td></tr></table></figure>
+
+<h4 id="四网测速"><a href="#四网测速" class="headerlink" title="四网测速"></a>四网测速</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">wget -O jcnf.sh https://raw.githubusercontent.com/Netflixxp/jcnfbesttrace/main/jcnf.sh</span><br><span class="line"></span><br><span class="line">bash jcnf.sh</span><br></pre></td></tr></table></figure>
+
+
+<h4 id="三网测速"><a href="#三网测速" class="headerlink" title="三网测速"></a>三网测速</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">bash &lt;(curl -Lso- https://git.io/superspeed_uxh)</span><br></pre></td></tr></table></figure>
+
+
+
+<p>带快速四网测试版本：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">bash &lt;(curl -Lso- https://dl.233.mba/d/sh/speedtest.sh)</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">bash &lt;(curl -Lso- https://git.io/J1SEh)</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="测试25端口是否开放"><a href="#测试25端口是否开放" class="headerlink" title="测试25端口是否开放"></a>测试25端口是否开放</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">telnet smtp.aol.com 25</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="测试IPv4优先还是IPv6优先"><a href="#测试IPv4优先还是IPv6优先" class="headerlink" title="测试IPv4优先还是IPv6优先"></a>测试IPv4优先还是IPv6优先</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">curl ip.p3terx.com</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="流媒体测试"><a href="#流媒体测试" class="headerlink" title="流媒体测试"></a>流媒体测试</h3><h4 id="全媒体测试"><a href="#全媒体测试" class="headerlink" title="全媒体测试"></a>全媒体测试</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">bash &lt;(curl -L -s https://raw.githubusercontent.com/lmc999/RegionRestrictionCheck/main/check.sh)</span><br></pre></td></tr></table></figure>
+
+
+<h4 id="奈飞测试"><a href="#奈飞测试" class="headerlink" title="奈飞测试"></a>奈飞测试</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">wget -O nf https://github.com/sjlleo/netflix-verify/releases/download/2.5/nf_2.5_linux_amd64 &amp;&amp; chmod +x nf &amp;&amp; clear &amp;&amp; ./nf</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#第一个</span><br><span class="line">bash &lt;(curl -L -s https://raw.githubusercontent.com/lmc999/RegionRestrictionCheck/main/check.sh)</span><br><span class="line"></span><br><span class="line"># 第二个</span><br><span class="line">bash &lt;(curl -sSL &quot;https://github.com/CoiaPrant/MediaUnlock_Test/raw/main/check.sh&quot;)</span><br></pre></td></tr></table></figure>
+
+<h2 id="WARP"><a href="#WARP" class="headerlink" title="WARP"></a>WARP</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">wget -N --no-check-certificate https://cdn.jsdelivr.net/gh/YG-tsj/CFWarp-Pro/multi.sh &amp;&amp; chmod +x multi.sh &amp;&amp; ./multi.sh</span><br></pre></td></tr></table></figure>
+
+
+
+<p>之后进入脚本快捷方式为 <code>bash multi.sh</code></p>
+<h2 id="服务器时间"><a href="#服务器时间" class="headerlink" title="服务器时间"></a>服务器时间</h2><h4 id="CentOS-同步时间"><a href="#CentOS-同步时间" class="headerlink" title="CentOS 同步时间"></a>CentOS 同步时间</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">yum -y install ntpdate</span><br><span class="line">timedatectl set-timezone Asia/Shanghai</span><br><span class="line">ntpdate ntp1.aliyun.com</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="BBR"><a href="#BBR" class="headerlink" title="BBR"></a>BBR</h2><h4 id="CentOS-7-BBR"><a href="#CentOS-7-BBR" class="headerlink" title="CentOS 7 BBR"></a>CentOS 7 BBR</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">wget -N --no-check-certificate &quot;https://raw.githubusercontent.com/chiakge/Linux-NetSpeed/master/tcp.sh&quot; &amp;&amp; chmod +x tcp.sh &amp;&amp; ./tcp.sh</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="一键开启BBR"><a href="#一键开启BBR" class="headerlink" title="一键开启BBR"></a>一键开启BBR</h4><p>注意：需要Linux Kernel 内核升级到 4.9 及以上版本可以实现 BBR 加速</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">uname -srm</span><br></pre></td></tr></table></figure>
+
+
+
+<p>输出结果：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">Linux 3.10.0-957.12.2.el7.x86_64 x86_64</span><br><span class="line">3 - 内核版本.</span><br><span class="line">10 - 主修订版本.</span><br><span class="line">0-957 - 次要修订版本.</span><br><span class="line">12 - 补丁版本.</span><br></pre></td></tr></table></figure>
+
+<p>一般来说，Ubuntu18.04以上就可以(默认的内核<code>4.15</code>)</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">echo &quot;net.core.default_qdisc=fq&quot; &gt;&gt; /etc/sysctl.conf</span><br><span class="line">echo &quot;net.ipv4.tcp_congestion_control=bbr&quot; &gt;&gt; /etc/sysctl.conf</span><br><span class="line"></span><br><span class="line">sysctl -p</span><br><span class="line"></span><br><span class="line">sysctl net.ipv4.tcp_available_congestion_control</span><br><span class="line"></span><br><span class="line">lsmod | grep bbr</span><br></pre></td></tr></table></figure>
+
+<h2 id="Docker相关"><a href="#Docker相关" class="headerlink" title="Docker相关"></a>Docker相关</h2><h4 id="更新、安装必备软件"><a href="#更新、安装必备软件" class="headerlink" title="更新、安装必备软件"></a>更新、安装必备软件</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">apt-get update &amp;&amp; apt-get install -y wget vim</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="海外服务器"><a href="#海外服务器" class="headerlink" title="海外服务器"></a>海外服务器</h3><h4 id="非大陆Docker安装"><a href="#非大陆Docker安装" class="headerlink" title="非大陆Docker安装"></a>非大陆Docker安装</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">wget -qO- get.docker.com | bash</span><br></pre></td></tr></table></figure>
+
+
+<h4 id="卸载Docker"><a href="#卸载Docker" class="headerlink" title="卸载Docker"></a>卸载Docker</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo apt-get purge docker-ce docker-ce-cli containerd.io</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo rm -rf /var/lib/docker</span><br><span class="line">sudo rm -rf /var/lib/containerd</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="非大陆Docker-compose安装"><a href="#非大陆Docker-compose安装" class="headerlink" title="非大陆Docker-compose安装"></a>非大陆Docker-compose安装</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo curl -L &quot;https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)&quot; -o /usr/local/bin/docker-compose</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo chmod +x /usr/local/bin/docker-compose</span><br></pre></td></tr></table></figure>
+
+
+
+<p>查看版本</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker-compose --version</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="大陆服务器"><a href="#大陆服务器" class="headerlink" title="大陆服务器"></a>大陆服务器</h3><h4 id="国内机安装docker"><a href="#国内机安装docker" class="headerlink" title="国内机安装docker"></a>国内机安装docker</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">curl -sSL https://get.daocloud.io/docker | sh</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="国内机安装docker-compose"><a href="#国内机安装docker-compose" class="headerlink" title="国内机安装docker-compose"></a>国内机安装docker-compose</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">curl -L https://get.daocloud.io/docker/compose/releases/download/v2.1.1/docker-compose-`uname -s`-`uname -m` &gt; /usr/local/bin/docker-compose</span><br><span class="line">chmod +x /usr/local/bin/docker-compose</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="卸载docker"><a href="#卸载docker" class="headerlink" title="卸载docker"></a>卸载docker</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo apt-get remove docker docker-engine</span><br><span class="line">rm -fr /var/lib/docker/</span><br></pre></td></tr></table></figure>
+
+<h2 id="防火墙"><a href="#防火墙" class="headerlink" title="防火墙"></a>防火墙</h2><h4 id="CentOS-关闭防火墙"><a href="#CentOS-关闭防火墙" class="headerlink" title="CentOS 关闭防火墙"></a>CentOS 关闭防火墙</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">systemctl start supervisord</span><br><span class="line">systemctl disable firewalld</span><br><span class="line">systemctl stop firewalld</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="宝塔相关"><a href="#宝塔相关" class="headerlink" title="宝塔相关"></a>宝塔相关</h2><h4 id="宝塔去除登陆-已经失效，解决方法见：https-blog-laoda-de-archives-bt-to-aapanel"><a href="#宝塔去除登陆-已经失效，解决方法见：https-blog-laoda-de-archives-bt-to-aapanel" class="headerlink" title="宝塔去除登陆 (已经失效，解决方法见：https://blog.laoda.de/archives/bt-to-aapanel)"></a>宝塔去除登陆 (已经失效，解决方法见：<a href="https://blog.laoda.de/archives/bt-to-aapanel">https://blog.laoda.de/archives/bt-to-aapanel</a>)</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sed -i &quot;s|if (bind_user == &#x27;True&#x27;) &#123;|if (bind_user == &#x27;REMOVED&#x27;) &#123;|g&quot; /www/server/panel/BTPanel/static/js/index.js</span><br><span class="line">rm -rf /www/server/panel/data/bind.pl</span><br></pre></td></tr></table></figure>
+
+
+<h4 id="宝塔-aapanel破解（这个目前也不保证可用了）"><a href="#宝塔-aapanel破解（这个目前也不保证可用了）" class="headerlink" title="宝塔&amp;aapanel破解（这个目前也不保证可用了）"></a>宝塔&amp;aapanel破解（这个目前也不保证可用了）</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># 宝塔&amp;aapanel破解</span><br><span class="line">编辑 /www/server/panel/class/panelplugin.py</span><br><span class="line">找到 softList[&#x27;list&#x27;] = tmpList 这行代码</span><br><span class="line">在下面添加以下代码，注意缩进</span><br><span class="line"></span><br><span class="line">softList[&#x27;pro&#x27;] = 1</span><br><span class="line">for soft in softList[&#x27;list&#x27;]:</span><br><span class="line">soft[&#x27;endtime&#x27;] = 0</span><br><span class="line"></span><br><span class="line">编辑完毕后保存重启面板即可</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="呆梨相关"><a href="#呆梨相关" class="headerlink" title="呆梨相关"></a>呆梨相关</h2><h4 id="XUI"><a href="#XUI" class="headerlink" title="XUI"></a>XUI</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">bash &lt;(curl -Ls https://raw.githubusercontent.com/FranzKafkaYu/x-ui/master/install.sh)</span><br></pre></td></tr></table></figure>
+
+
+
+<p>脚本来源：<a href="https://github.com/FranzKafkaYu/x-ui">https://github.com/FranzKafkaYu/x-ui</a></p>
+<h4 id="mack-a"><a href="#mack-a" class="headerlink" title="mack-a"></a>mack-a</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">wget -P /root -N --no-check-certificate &quot;https://raw.githubusercontent.com/mack-a/v2ray-agent/master/install.sh&quot; &amp;&amp; chmod 700 /root/install.sh &amp;&amp; /root/install.sh</span><br></pre></td></tr></table></figure>
+
+
+
+<p>持续更新中</p>
+]]></content>
+      <categories>
+        <category>脚本</category>
+      </categories>
+      <tags>
+        <tag>docker</tag>
+        <tag>脚本</tag>
+      </tags>
+  </entry>
+</search>
