@@ -676,48 +676,6 @@
       </tags>
   </entry>
   <entry>
-    <title>网站流量统计工具 -Plausible</title>
-    <url>/undefined/a0a38a3f/</url>
-    <content><![CDATA[<p>Plausible是一款轻量级、开源的网页分析工具，通过Docker部署时，其核心特点包括：</p>
-<ol>
-<li><strong>隐私优先</strong>：注重用户隐私，不使用cookies，遵守GDPR和CMPA标准。</li>
-<li><strong>轻量化</strong>：对网站性能影响小，加载速度快，无第三方跟踪。</li>
-<li><strong>易于部署</strong>：借助Docker，快速启动和配置，实现无缝部署。</li>
-<li><strong>数据实时</strong>：提供实时访客统计，即时洞察网站流量动态。</li>
-<li><strong>自托管</strong>：数据由用户自己掌控，增强数据安全与自主性。</li>
-<li><strong>界面直观</strong>：简洁的仪表板展示关键指标，便于数据分析。</li>
-</ol>
-<p>创建一下安装的目录：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mkdir -p /root/data/docker_data/plausible</span><br><span class="line"></span><br><span class="line">cd /root/data/docker_data/plausible</span><br><span class="line"></span><br><span class="line">git clone https://github.com/plausible/hosting</span><br><span class="line"></span><br><span class="line">cd hosting</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">vim docker-compose.yml</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">version: &quot;3.3&quot;</span><br><span class="line">services:</span><br><span class="line">  mail:</span><br><span class="line">    image: bytemark/smtp</span><br><span class="line">    restart: always</span><br><span class="line"></span><br><span class="line">  plausible_db:</span><br><span class="line">    # supported versions are 12, 13, and 14</span><br><span class="line">    image: postgres:14-alpine</span><br><span class="line">    restart: always</span><br><span class="line">    volumes:</span><br><span class="line">      - ./db-data:/var/lib/postgresql/data</span><br><span class="line">    environment:</span><br><span class="line">      - POSTGRES_PASSWORD=postgres</span><br><span class="line"></span><br><span class="line">  plausible_events_db:</span><br><span class="line">    image: clickhouse/clickhouse-server:23.3.7.5-alpine</span><br><span class="line">    restart: always</span><br><span class="line">    volumes:</span><br><span class="line">      - ./event-data:/var/lib/clickhouse</span><br><span class="line">      - ./clickhouse/clickhouse-config.xml:/etc/clickhouse-server/config.d/logging.xml:ro</span><br><span class="line">      - ./clickhouse/clickhouse-user-config.xml:/etc/clickhouse-server/users.d/logging.xml:ro</span><br><span class="line">    ulimits:</span><br><span class="line">      nofile:</span><br><span class="line">        soft: 262144</span><br><span class="line">        hard: 262144</span><br><span class="line"></span><br><span class="line">  plausible:</span><br><span class="line">    image: plausible/analytics:v2.0</span><br><span class="line">    restart: always</span><br><span class="line">    command: sh -c &quot;sleep 10 &amp;&amp; /entrypoint.sh db createdb &amp;&amp; /entrypoint.sh db migrate &amp;&amp; /entrypoint.sh run&quot;</span><br><span class="line">    depends_on:</span><br><span class="line">      - plausible_db</span><br><span class="line">      - plausible_events_db</span><br><span class="line">      - mail</span><br><span class="line">    ports:</span><br><span class="line">      - 8080:8000     # 左边端口号随便改</span><br><span class="line">    env_file:</span><br><span class="line">      - plausible-conf.env</span><br></pre></td></tr></table></figure>
-
-<p>生成密钥：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">openssl rand -base64 64 | tr -d &#x27;\n&#x27; ; echo</span><br></pre></td></tr></table></figure>
-
-
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">vim plausible-conf.env</span><br></pre></td></tr></table></figure>
-
-
-<p>BASE_URL&#x3D;<a href="https://xxxxxxxxxxx/">https://xxxxxxxxxxx</a><br>(密钥)SECRET_KEY_BASE&#x3D;xxxxxxxxxxxxxxxxxxxxxx</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker-compose up -d</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-]]></content>
-      <categories>
-        <category>dockers</category>
-      </categories>
-      <tags>
-        <tag>docker</tag>
-        <tag>监控</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>uptime 网站监控搭建</title>
     <url>/undefined/2023caab/</url>
     <content><![CDATA[<p>Uptime Kuma是一款开源的监控工具，通过Docker部署时，其特点包括：</p>
@@ -991,6 +949,48 @@
       <tags>
         <tag>docker</tag>
         <tag>脚本</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>网站流量统计工具 -Plausible</title>
+    <url>/undefined/a0a38a3f/</url>
+    <content><![CDATA[<p>Plausible是一款轻量级、开源的网页分析工具，通过Docker部署时，其核心特点包括：</p>
+<ol>
+<li><strong>隐私优先</strong>：注重用户隐私，不使用cookies，遵守GDPR和CMPA标准。</li>
+<li><strong>轻量化</strong>：对网站性能影响小，加载速度快，无第三方跟踪。</li>
+<li><strong>易于部署</strong>：借助Docker，快速启动和配置，实现无缝部署。</li>
+<li><strong>数据实时</strong>：提供实时访客统计，即时洞察网站流量动态。</li>
+<li><strong>自托管</strong>：数据由用户自己掌控，增强数据安全与自主性。</li>
+<li><strong>界面直观</strong>：简洁的仪表板展示关键指标，便于数据分析。</li>
+</ol>
+<p>创建一下安装的目录：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mkdir -p /root/data/docker_data/plausible</span><br><span class="line"></span><br><span class="line">cd /root/data/docker_data/plausible</span><br><span class="line"></span><br><span class="line">git clone https://github.com/plausible/hosting</span><br><span class="line"></span><br><span class="line">cd hosting</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">vim docker-compose.yml</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">version: &quot;3.3&quot;</span><br><span class="line">services:</span><br><span class="line">  mail:</span><br><span class="line">    image: bytemark/smtp</span><br><span class="line">    restart: always</span><br><span class="line"></span><br><span class="line">  plausible_db:</span><br><span class="line">    # supported versions are 12, 13, and 14</span><br><span class="line">    image: postgres:14-alpine</span><br><span class="line">    restart: always</span><br><span class="line">    volumes:</span><br><span class="line">      - ./db-data:/var/lib/postgresql/data</span><br><span class="line">    environment:</span><br><span class="line">      - POSTGRES_PASSWORD=postgres</span><br><span class="line"></span><br><span class="line">  plausible_events_db:</span><br><span class="line">    image: clickhouse/clickhouse-server:23.3.7.5-alpine</span><br><span class="line">    restart: always</span><br><span class="line">    volumes:</span><br><span class="line">      - ./event-data:/var/lib/clickhouse</span><br><span class="line">      - ./clickhouse/clickhouse-config.xml:/etc/clickhouse-server/config.d/logging.xml:ro</span><br><span class="line">      - ./clickhouse/clickhouse-user-config.xml:/etc/clickhouse-server/users.d/logging.xml:ro</span><br><span class="line">    ulimits:</span><br><span class="line">      nofile:</span><br><span class="line">        soft: 262144</span><br><span class="line">        hard: 262144</span><br><span class="line"></span><br><span class="line">  plausible:</span><br><span class="line">    image: plausible/analytics:v2.0</span><br><span class="line">    restart: always</span><br><span class="line">    command: sh -c &quot;sleep 10 &amp;&amp; /entrypoint.sh db createdb &amp;&amp; /entrypoint.sh db migrate &amp;&amp; /entrypoint.sh run&quot;</span><br><span class="line">    depends_on:</span><br><span class="line">      - plausible_db</span><br><span class="line">      - plausible_events_db</span><br><span class="line">      - mail</span><br><span class="line">    ports:</span><br><span class="line">      - 8080:8000     # 左边端口号随便改</span><br><span class="line">    env_file:</span><br><span class="line">      - plausible-conf.env</span><br></pre></td></tr></table></figure>
+
+<p>生成密钥：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">openssl rand -base64 64 | tr -d &#x27;\n&#x27; ; echo</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">vim plausible-conf.env</span><br></pre></td></tr></table></figure>
+
+
+<p>BASE_URL&#x3D;<a href="https://xxxxxxxxxxx/">https://xxxxxxxxxxx</a><br>(密钥)SECRET_KEY_BASE&#x3D;xxxxxxxxxxxxxxxxxxxxxx</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker-compose up -d</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+]]></content>
+      <categories>
+        <category>dockers</category>
+      </categories>
+      <tags>
+        <tag>docker</tag>
+        <tag>监控</tag>
       </tags>
   </entry>
   <entry>
