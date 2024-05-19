@@ -2,7 +2,7 @@
 <search>
   <entry>
     <title>docker常用命令</title>
-    <url>/undefined/d73d9aa0/</url>
+    <url>/undefined/undefined/</url>
     <content><![CDATA[<p>1.docker或docker-help#查看docker自带的帮助信息  </p>
 <p>启动类命令  </p>
 <p>systemctl start docker              # 启动dockerQ  </p>
@@ -154,7 +154,7 @@
 </ul>
 ]]></content>
       <categories>
-        <category>dockers</category>
+        <category>docker</category>
       </categories>
       <tags>
         <tag>docker</tag>
@@ -205,7 +205,7 @@
   </entry>
   <entry>
     <title>nginx proxy manager安装</title>
-    <url>/undefined/e5f66663/</url>
+    <url>/undefined/null/</url>
     <content><![CDATA[<p>图示：<br><img src="https://picgo-1321316737.cos.ap-guangzhou.myqcloud.com/img/20240513145119.png"></p>
 <h2 id="1、主要特点："><a href="#1、主要特点：" class="headerlink" title="1、主要特点："></a>1、主要特点：</h2><ol>
 <li><strong>图形化界面</strong>：提供用户友好的Web界面，允许用户通过点选和表单填写的方式而非手动编辑Nginx配置文件来配置反向代理规则、上游服务器、重定向、SSL证书等，大大降低了配置Nginx的难度。</li>
@@ -714,11 +714,8 @@
 <li><strong>易于部署</strong>：借助Docker，快速启动和配置，实现无缝部署。</li>
 <li><strong>数据实时</strong>：提供实时访客统计，即时洞察网站流量动态。</li>
 <li><strong>自托管</strong>：数据由用户自己掌控，增强数据安全与自主性。</li>
-<li><strong>界面直观</strong>：简洁的仪表板展示关键指标，便于数据分析。</li>
+<li><strong>界面直观</strong>：简洁的仪表板展示关键指标，便于数据分析。<br>创建一下安装的目录：<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mkdir -p /root/data/docker_data/plausible</span><br><span class="line"></span><br><span class="line">cd /root/data/docker_data/plausible</span><br><span class="line"></span><br><span class="line">git clone https://github.com/plausible/hosting</span><br><span class="line"></span><br><span class="line">cd hosting</span><br></pre></td></tr></table></figure></li>
 </ol>
-<p>创建一下安装的目录：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mkdir -p /root/data/docker_data/plausible</span><br><span class="line"></span><br><span class="line">cd /root/data/docker_data/plausible</span><br><span class="line"></span><br><span class="line">git clone https://github.com/plausible/hosting</span><br><span class="line"></span><br><span class="line">cd hosting</span><br></pre></td></tr></table></figure>
-
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">vim docker-compose.yml</span><br></pre></td></tr></table></figure>
 
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">version: &quot;3.3&quot;</span><br><span class="line">services:</span><br><span class="line">  mail:</span><br><span class="line">    image: bytemark/smtp</span><br><span class="line">    restart: always</span><br><span class="line"></span><br><span class="line">  plausible_db:</span><br><span class="line">    # supported versions are 12, 13, and 14</span><br><span class="line">    image: postgres:14-alpine</span><br><span class="line">    restart: always</span><br><span class="line">    volumes:</span><br><span class="line">      - ./db-data:/var/lib/postgresql/data</span><br><span class="line">    environment:</span><br><span class="line">      - POSTGRES_PASSWORD=postgres</span><br><span class="line"></span><br><span class="line">  plausible_events_db:</span><br><span class="line">    image: clickhouse/clickhouse-server:23.3.7.5-alpine</span><br><span class="line">    restart: always</span><br><span class="line">    volumes:</span><br><span class="line">      - ./event-data:/var/lib/clickhouse</span><br><span class="line">      - ./clickhouse/clickhouse-config.xml:/etc/clickhouse-server/config.d/logging.xml:ro</span><br><span class="line">      - ./clickhouse/clickhouse-user-config.xml:/etc/clickhouse-server/users.d/logging.xml:ro</span><br><span class="line">    ulimits:</span><br><span class="line">      nofile:</span><br><span class="line">        soft: 262144</span><br><span class="line">        hard: 262144</span><br><span class="line"></span><br><span class="line">  plausible:</span><br><span class="line">    image: plausible/analytics:v2.0</span><br><span class="line">    restart: always</span><br><span class="line">    command: sh -c &quot;sleep 10 &amp;&amp; /entrypoint.sh db createdb &amp;&amp; /entrypoint.sh db migrate &amp;&amp; /entrypoint.sh run&quot;</span><br><span class="line">    depends_on:</span><br><span class="line">      - plausible_db</span><br><span class="line">      - plausible_events_db</span><br><span class="line">      - mail</span><br><span class="line">    ports:</span><br><span class="line">      - 8080:8000     # 左边端口号随便改</span><br><span class="line">    env_file:</span><br><span class="line">      - plausible-conf.env</span><br></pre></td></tr></table></figure>
@@ -986,11 +983,226 @@
 <p>持续更新中</p>
 ]]></content>
       <categories>
-        <category>脚本</category>
+        <category>脚本s</category>
       </categories>
       <tags>
         <tag>docker</tag>
         <tag>脚本</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>哪吒监控面板——nezha</title>
+    <url>/undefined/569783/</url>
+    <content><![CDATA[<p>哪吒监控面板是一个开源的 Docker 应用，它的特点包括：</p>
+<ul>
+<li><strong>简单易用</strong>：易于安装和配置，使监控变得简单。</li>
+<li><strong>全面监控</strong>：提供全方位的系统监控和性能分析功能。</li>
+<li><strong>可扩展性强</strong>：支持插件和自定义指标，满足各种监控需求。</li>
+<li><strong>可视化展示</strong>：通过直观的图表和仪表板展示监控数据，方便用户理解和分析。</li>
+</ul>
+<p>目前部署了这个<a href="https://status.baiyunweb.top/">监控网站</a>，感觉还行吧！</p>
+<h2 id="获取-Github-的-Client-ID-和密钥"><a href="#获取-Github-的-Client-ID-和密钥" class="headerlink" title="获取 Github 的 Client ID 和密钥"></a>获取 Github 的 Client ID 和密钥</h2><p>哪吒监控接入 Github 作为后台管理员账号来确保安全</p>
+<ul>
+<li>登录 Github 后，打开 <a href="https://github.com/settings/developers">https://github.com/settings/developers</a> ，依次选择“OAuth Apps” – “New OAuth App”</li>
+</ul>
+<p><code>Application name</code> – 随意填写<br><code>Homepage URL</code> – 填写面板的访问域名，如：<a href="https://status.baiyunweb.top/">https://status.baiyunweb.top</a><br><code>Authorization callback URL</code> – 填写回调地址，如：<a href="https://status.baiyunweb.top/oauth2/callback">https://status.baiyunweb.top/oauth2/callback</a></p>
+<ul>
+<li>点击 “Register application”</li>
+<li>保存页面中的 Client ID，然后点击 “Generate a new client secret“，创建一个新的 Client Secret，新建的密钥仅会显示一次，请妥善保存</li>
+</ul>
+<h2 id="在服务器中安装哪吒监控面板"><a href="#在服务器中安装哪吒监控面板" class="headerlink" title="在服务器中安装哪吒监控面板"></a>在服务器中安装哪吒监控面板</h2><p>官方安装脚本：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">curl -L https://raw.githubusercontent.com/naiba/nezha/master/script/install.sh -o nezha.sh &amp;&amp; chmod +x nezha.sh &amp;&amp; sudo ./nezha.sh</span><br></pre></td></tr></table></figure>
+
+
+<p>大陆的服务器，可以使用镜像：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">curl -L https://jihulab.com/nezha/dashboard/-/raw/master/script/install.sh -o nezha.sh &amp;&amp; chmod +x nezha.sh &amp;&amp; sudo CN=true ./nezha.sh</span><br></pre></td></tr></table></figure>
+
+
+<ul>
+<li>等待Docker安装完毕后，分别输入以下值：<br>  <code>OAuth提供商</code> – Github，Gitlab，Jihulab，Gitee 中选择一个<br>  <code>Client ID</code> – 之前保存的 Client ID<br>  <code>Client Secret</code> – 之前保存的密钥<br>  <code>用户名</code> – OAuth 提供商中的用户名<br>  <code>站点标题</code> – 自定义站点标题<br>  <code>访问端口</code> – 公开访问端口，可自定义，默认 8008<br>  <code>Agent的通信端口</code> – Agent与Dashboard的通信端口，默认 5555</li>
+<li>输入完成后，等待拉取镜像<br>  安装结束后，如果一切正常，此时你可以访问域名+端口号，如 “<a href="https://status.baiyunweb.top”/">https://status.baiyunweb.top”</a> 来查看面板</li>
+<li>将来如果需要再次运行脚本，可以运行以下命令来打开管理脚本：</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">./nezha.sh</span><br></pre></td></tr></table></figure>
+<h2 id="成果展示"><a href="#成果展示" class="headerlink" title="成果展示"></a>成果展示</h2><p><img src="https://picgo-1321316737.cos.ap-guangzhou.myqcloud.com/img/202405151506456.png"></p>
+]]></content>
+      <categories>
+        <category>docker</category>
+      </categories>
+      <tags>
+        <tag>docker</tag>
+        <tag>监控</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>个人博客-Halo 2.0</title>
+    <url>/undefined/91208508/</url>
+    <content><![CDATA[<p>Halo 2.0是一款基于Spring Boot和Vue.js框架构建的现代化开源内容管理系统（CMS），专为个人博客及小型网站设计。作为一款开源软件，Halo不仅代码开放，而且完全免费，这意味着用户可以自由地查看、修改源代码以适应个性化需求，同时也能够享受到社区的支持和持续的更新。</p>
+<h2 id="Halo-2-0的一些显著特点："><a href="#Halo-2-0的一些显著特点：" class="headerlink" title="Halo 2.0的一些显著特点："></a>Halo 2.0的一些显著特点：</h2><ol>
+<li><strong>快速启动与轻量级</strong>：借助Docker容器化技术，Halo 2.0可以迅速启动，资源占用小，非常适合快速搭建个人博客。容器化的部署方式确保了环境的一致性，无论在本地开发还是云端部署都能保持相同的运行效果。</li>
+<li><strong>高性能与高效率</strong>：利用Docker的高效资源利用能力，Halo能够在低资源消耗的前提下提供稳定的性能表现。其背后的技术栈如Spring Boot和Vue.js，都是为提高开发效率和运行时性能而精心选择的。</li>
+<li><strong>现代化技术栈</strong>：采用Spring Boot作为后端框架，保证了应用的快速开发与部署能力，同时Vue.js作为前端框架，提供了流畅的用户交互体验和响应式设计，使得网站在不同设备上都能有良好的展示效果。</li>
+<li><strong>易部署与维护</strong>：通过Docker部署，用户可以轻松地在任何支持Docker的系统上部署Halo，极大地简化了环境配置的复杂度。Docker Compose的使用更是使得多服务协作变得简单，一键即可完成整个博客系统的搭建与配置。</li>
+<li><strong>模块化与可扩展性</strong>：Halo设计上支持插件和主题的扩展，用户可以根据需要安装各种功能插件或更换界面主题，以丰富博客的功能和个性化外观。</li>
+<li><strong>云原生友好</strong>：作为云原生时代的产品，Halo 2.0对云环境有着良好的支持，便于在云服务商上部署和运维，支持自动扩缩容等高级特性。</li>
+<li><strong>社区活跃与文档齐全</strong>：拥有活跃的开发者社区，不断更新的文档和示例，即使是初学者也能快速上手，遇到问题时容易找到帮助。</li>
+</ol>
+<h2 id="2-项目展示"><a href="#2-项目展示" class="headerlink" title="2. 项目展示"></a>2. 项目展示</h2><p>文档地址：<a href="http://docs.halo.run/" title="http://docs.halo.run/"></a><a href="http://docs.halo.run/" title="http://docs.halo.run/">http://docs.halo.run/</a><br>社区地址：<a href="https://bbs.halo.run/" title="https://bbs.halo.run/"></a><a href="https://bbs.halo.run/" title="https://bbs.halo.run/">https://bbs.halo.run/</a><br>官网地址：<a href="https://halo.run/" title="https://halo.run/"></a><a href="https://halo.run/" title="https://halo.run/">https://halo.run/</a><br>GitHub地址：<a href="https://github.com/halo-dev/halo" title="https://github.com/halo-dev/halo"></a><a href="https://github.com/halo-dev/halo" title="https://github.com/halo-dev/halo">https://github.com/halo-dev/halo</a><br>Demo地址：<a href="https://demo.halo.run/" title="https://demo.halo.run/"></a><a href="https://demo.halo.run/" title="https://demo.halo.run/">https://demo.halo.run</a><br>Demo后台：<a href="https://demo.halo.run/console" title="https://demo.halo.run/console"></a><a href="https://demo.halo.run/console" title="https://demo.halo.run/console">https://demo.halo.run/console</a><br>用户名：<code>demo</code><br>密码：<a href="mailto:code%3EP@ssw0rd123..%3C/code" title="mailto:code%3EP@ssw0rd123..%3C/code">code&gt;P@ssw0rd123..</a></p>
+<p><a href="mailto:code%3EP@ssw0rd123..%3C/code" title="mailto:code%3EP@ssw0rd123..%3C/code">注意：<code>docker-compose.yml</code> 里面的<code>--halo.external-url=</code></a><code>[http://localhost:8090/](http://localhost:8090/)</code> ，其中的<code>[http://localhost:8090/](http://localhost:8090/)</code>需要更改为你的域名，如果你打算用的域名是<code>abc.com</code>也就是要改成<code>--halo.external-url=[https://abc.com](https://abc.com/)</code></p>
+<p>版本号<code>2.6.0</code>，可以看这边：<a href="https://github.com/halo-dev/halo/releases" title="https://github.com/halo-dev/halo/releases"></a><a href="https://github.com/halo-dev/halo/releases" title="https://github.com/halo-dev/halo/releases">https://github.com/halo-dev/halo/releases</a> 保证自己是新版本～</p>
+<p>接着，千万记得改密码！！！</p>
+<p>不然，你也会像这样：</p>
+<p><a href="https://img.laoda.de/i/2023/03/09/r8ovzn-0.webp" title="https://img.laoda.de/i/2023/03/09/r8ovzn-0.webp"><img src="https://iwanlab.com/docker-compose-install-halo-version-2/75799c30a3a90bd3e5dc2d6f3c6286d4.png">  
+</a></p>
+<p>PS：细心的小伙伴会发现，<code>docker-compose.yml</code>里面数据库<code>3306</code>并没有写成<code>3306:3306</code>，官网是写的后者，咕咕改成了前者，为的就是不在公网暴露halo数据库的端口，这样也能一定程度保障博客的安全。</p>
+<p>以下是详细搭建教程。</p>
+<h2 id="3-搭建环境"><a href="#3-搭建环境" class="headerlink" title="3. 搭建环境"></a>3. 搭建环境</h2><ul>
+<li>系统：Debian 10 （<a href="https://blog.laoda.de/archives/useful-script#dd%E7%9B%B8%E5%85%B3" title="https://blog.laoda.de/archives/useful-script#dd%E7%9B%B8%E5%85%B3">DD 脚本</a> 非必需 DD，用原来的系统也 OK，之后教程都是用 Debian 或者 Ubuntu 搭建～）</li>
+<li>安装好 Docker、Docker-compose（<a href="https://blog.laoda.de/archives/hello-docker#5%E5%AE%89%E8%A3%85dockerdocker-compose" title="https://blog.laoda.de/archives/hello-docker#5%E5%AE%89%E8%A3%85dockerdocker-compose">相关脚本</a>）</li>
+<li>【非必需但建议】域名一枚，并做好解析到服务器上（<a href="https://blog.laoda.de/archives/namesilo" title="https://blog.laoda.de/archives/namesilo">域名购买、域名解析</a> <a href="https://www.bilibili.com/video/BV1Sy4y1k7kZ/" title="https://www.bilibili.com/video/BV1Sy4y1k7kZ/">视频教程</a>）</li>
+<li>【非必需】提前安装好宝塔面板海外版本 aapanel，并安装好 Nginx（<a href="https://forum.aapanel.com/d/9-aapanel-linux-panel-6812-installation-tutorial" title="https://forum.aapanel.com/d/9-aapanel-linux-panel-6812-installation-tutorial">安装地址</a>）</li>
+<li>【非必需本教程选用】安装好 Nginx Proxy Manager（<a href="https://blog.laoda.de/archives/nginxproxymanager" title="https://blog.laoda.de/archives/nginxproxymanager">相关教程</a>）</li>
+</ul>
+<blockquote>
+<p>服务器要求：内存建议1G 以上，硬盘可以大一些。</p>
+</blockquote>
+<h2 id="4-搭建视频"><a href="#4-搭建视频" class="headerlink" title="4. 搭建视频"></a>4. 搭建视频</h2><p>视频地址：<a href="https://www.bilibili.com/BV1wk4y1h7Ma" title="https://www.bilibili.com/BV1wk4y1h7Ma"></a><a href="https://www.bilibili.com/BV1wk4y1h7Ma" title="https://www.bilibili.com/BV1wk4y1h7Ma">https://www.bilibili.com/BV1wk4y1h7Ma</a></p>
+<h2 id="5-搭建方式"><a href="#5-搭建方式" class="headerlink" title="5. 搭建方式"></a>5. 搭建方式</h2><p>创建一下安装的目录：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo -i</span><br><span class="line"></span><br><span class="line">mkdir -p /root/data/docker_data/halo</span><br><span class="line">cd /root/data/docker_data/halo</span><br><span class="line"></span><br><span class="line">vim docker-compose.yml</span><br></pre></td></tr></table></figure>
+
+<p>这边我们直接用 docker 的方式安装。</p>
+<p>英文输入法下，按 <code>i</code></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">version: &quot;3&quot;</span><br><span class="line"></span><br><span class="line">services:</span><br><span class="line">  halo:</span><br><span class="line">    image: halohub/halo:2.10.0</span><br><span class="line">    container_name: halo</span><br><span class="line">    restart: on-failure:3</span><br><span class="line">    depends_on:</span><br><span class="line">      halodb:</span><br><span class="line">        condition: service_healthy</span><br><span class="line">    networks:</span><br><span class="line">      halo_network:</span><br><span class="line">    volumes:</span><br><span class="line">      - ./:/root/.halo2</span><br><span class="line">    ports:</span><br><span class="line">      - &quot;8080:8090&quot; #左边端口随便改</span><br><span class="line">    command:</span><br><span class="line">      - --spring.r2dbc.url=r2dbc:pool:mysql://halodb:3306/halo</span><br><span class="line">      - --spring.r2dbc.username=root</span><br><span class="line">      </span><br><span class="line">      - --spring.r2dbc.password=o#DwN&amp;JSa56</span><br><span class="line">      - --spring.sql.init.platform=mysql</span><br><span class="line">      </span><br><span class="line">      - --halo.external-url=https://www.example.com</span><br><span class="line">      </span><br><span class="line">      - --halo.security.initializer.superadminusername=admin</span><br><span class="line">      </span><br><span class="line">      - --halo.security.initializer.superadminpassword=P@88w0rd</span><br><span class="line"></span><br><span class="line">  halodb:</span><br><span class="line">    image: mysql:8.0.31</span><br><span class="line">    container_name: halodb</span><br><span class="line">    restart: on-failure:3</span><br><span class="line">    networks:</span><br><span class="line">      halo_network:</span><br><span class="line">    command: </span><br><span class="line">      - --default-authentication-plugin=mysql_native_password</span><br><span class="line">      - --character-set-server=utf8mb4</span><br><span class="line">      - --collation-server=utf8mb4_general_ci</span><br><span class="line">      - --explicit_defaults_for_timestamp=true</span><br><span class="line">    volumes:</span><br><span class="line">      - ./mysql:/var/lib/mysql</span><br><span class="line">      - ./mysqlBackup:/data/mysqlBackup</span><br><span class="line">    ports:</span><br><span class="line">      - &quot;3306&quot;</span><br><span class="line">    healthcheck:</span><br><span class="line">      test: [&quot;CMD&quot;, &quot;mysqladmin&quot;, &quot;ping&quot;, &quot;-h&quot;, &quot;127.0.0.1&quot;, &quot;--silent&quot;]</span><br><span class="line">      interval: 3s</span><br><span class="line">      retries: 5</span><br><span class="line">      start_period: 30s</span><br><span class="line">    environment:</span><br><span class="line">      </span><br><span class="line">      - MYSQL_ROOT_PASSWORD=o#DwN&amp;JSa56</span><br><span class="line">      - MYSQL_DATABASE=halo</span><br><span class="line"></span><br><span class="line">networks:</span><br><span class="line">  halo_network:</span><br></pre></td></tr></table></figure>
+
+<p>注意：<code>docker-compose.yml</code> 里面的<code>--halo.external-url=[http://localhost:8090/](http://localhost:8090/)</code> ，其中的<code>[http://localhost:8090/](http://localhost:8090/)</code>需要更改为你的域名，如果你打算用的域名是<code>abc.com</code>也就是要改成<code>--halo.external-url=[https://abc.com](https://abc.com/)</code></p>
+<p>版本号<code>2.6.0</code>，可以看这边：<a href="https://github.com/halo-dev/halo/releases" title="https://github.com/halo-dev/halo/releases"></a><a href="https://github.com/halo-dev/halo/releases" title="https://github.com/halo-dev/halo/releases">https://github.com/halo-dev/halo/releases</a> 保证自己是新版本～</p>
+<p>接着，千万记得改密码！！！<br>PS：细心的小伙伴会发现，<code>docker-compose.yml</code>里面数据库<code>3306</code>并没有写成<code>3306:3306</code>，官网是写的后者，咕咕改成了前者，为的就是不在公网暴露halo数据库的端口，这样也能一定程度保障博客的安全。</p>
+<p>修改好之后，注意切换成英文输入法，然后按一下 <code>esc</code>，然后 <code>:wq</code> 保存退出。</p>
+<h3 id="5-3-打开服务器防火墙（非必需）并访问网页"><a href="#5-3-打开服务器防火墙（非必需）并访问网页" class="headerlink" title="5.3 打开服务器防火墙（非必需）并访问网页"></a>5.3 打开服务器防火墙（非必需）并访问网页</h3><p>打开防火墙的端口 <code>8090</code></p>
+<p>举例，腾讯云打开方法如下（部分服务商没有自带的面板防火墙，就不用这步操作了）：</p>
+<p>图中示例填的是 <code>5230</code>，备注填的是 <code>memos</code>，这边我们填 <code>8090</code>，示例填 <code>halo</code> ，确定即可（如果你在 docker-compose 文件里换了 <code>9009</code>，这边就需要填 <code>9009</code>，以此类推）<br>查看端口是否被占用（以 <code>8090</code> 为例），输入：</p>
+<p>如果啥也没出现，表示端口未被占用，我们可以继续下面的操作了～</p>
+<p>如果出现：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">-bash: lsof: command not found</span><br></pre></td></tr></table></figure>
+
+<p>运行：</p>
+<p>如果端口没有被占用（被占用了就修改一下端口，比如改成 <code>8081</code>，注意 docker 命令行里和防火墙都要改）</p>
+<p>最后：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cd /root/data/docker_data/halo    </span><br><span class="line"></span><br><span class="line">docker-compose up -d </span><br></pre></td></tr></table></figure>
+
+<p>理论上我们就可以输入 <code>[http://ip:8090](http://ip:8090/)</code> 访问安装了。</p>
+<blockquote>
+<p><strong>注意：</strong></p>
+<p>1、不知道服务器 IP，可以直接在命令行输入：<code>curl ip.sb</code>，会显示当前服务器的 IP。</p>
+<p>2、遇到访问不了的情况，请再次检查在宝塔面板的防火墙和服务商的后台防火墙是否打开对应了端口。</p>
+</blockquote>
+<p>有的小伙伴可能想搭建起来分享给其他人使用，如果后续想要分享给别人，IP + 端口太不优雅了，咕咕建议大家还是搞一个域名，容易记，看起来也更正规一点。这样可以做 https，会让网页更安全。</p>
+<p>我们接着往下看！</p>
+<h3 id="5-4-更新-halo"><a href="#5-4-更新-halo" class="headerlink" title="5.4 更新 halo"></a>5.4 更新 halo</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cd /root/data/docker_data/halo</span><br><span class="line"></span><br><span class="line">docker-compose down </span><br><span class="line"></span><br><span class="line">cp -r /root/data/docker_data/halo /root/data/docker_data/halo.archive  </span><br><span class="line"></span><br><span class="line">docker-compose pull</span><br><span class="line"></span><br><span class="line">docker-compose up -d    </span><br><span class="line"></span><br><span class="line">docker image prune  </span><br></pre></td></tr></table></figure>
+
+<p>提示：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">WARNING! This will remove all dangling images.</span><br><span class="line">Are you sure you want to continue? [y/N] </span><br></pre></td></tr></table></figure>
+
+<p>输入 <code>y</code></p>
+<p>利用 Docker 搭建的应用，更新非常容易～</p>
+<h3 id="5-5-卸载-halo"><a href="#5-5-卸载-halo" class="headerlink" title="5.5 卸载 halo"></a>5.5 卸载 halo</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cd /root/data/docker_data/halo</span><br><span class="line"></span><br><span class="line">docker-compose down</span><br><span class="line"></span><br><span class="line">cd ..</span><br><span class="line"></span><br><span class="line">rm -rf /root/data/docker_data/halo  </span><br></pre></td></tr></table></figure>
+
+<p>可以卸载得很干净。</p>
+<h2 id="6-反向代理"><a href="#6-反向代理" class="headerlink" title="6. 反向代理"></a>6. 反向代理</h2><p>我们要用域名而不是IP+端口的方式来访问我们的服务！</p>
+<h3 id="6-1-利用-Nginx-Proxy-Manager"><a href="#6-1-利用-Nginx-Proxy-Manager" class="headerlink" title="6.1 利用 Nginx Proxy Manager"></a>6.1 利用 Nginx Proxy Manager</h3><p>在添加反向代理之前，确保你已经完成了域名解析，不会的可以看这个：<strong>域名一枚，并做好解析到服务器上</strong>之后，登陆 Nginx Proxy Manager</p>
+<blockquote>
+<p><strong>注意：</strong></p>
+<p>Nginx Proxy Manager（以下简称 NPM）会用到 <code>80</code>、<code>443</code> 端口，所以本机不能占用（比如原来就有 Nginx）</p>
+</blockquote>
+<p>直接丢几张图：</p>
+<blockquote>
+<p>注意填写对应的 <code>域名</code>、<code>IP</code> 和 <code>端口</code>，按文章来的话，应该是 <code>8090</code></p>
+</blockquote>
+<p><strong>IP 填写：</strong></p>
+<p>如果 Nginx Proxy Manager 和 halo 在同一台服务器上，可以在终端输入：</p>
+<p>查看对应的 Docker 容器内部 IP。</p>
+<p>否则直接填 <code>halo</code> 所在的服务器 IP 就行。</p>
+<p>注意：<code>docker-compose.yml</code> 里面的<code>--halo.external-url=[http://localhost:8090/](http://localhost:8090/)</code> ，其中的<code>[http://localhost:8090/](http://localhost:8090/)</code>需要更改为你的域名，如果你的域名是<code>abc.com</code>也就是要改成<code>--halo.external-url=[https://abc.com](https://abc.com/)</code></p>
+<h3 id="6-2-利用宝塔面板"><a href="#6-2-利用宝塔面板" class="headerlink" title="6.2 利用宝塔面板"></a>6.2 利用宝塔面板</h3><p>发现还是有不少小伙伴习惯用宝塔面板，这边也贴一个宝塔面板的反代配置：</p>
+<p>直接新建一个站点，不要数据库，不要 php，纯静态即可。</p>
+<p>然后打开下面的配置，修改 Nginx 的配置。</p>
+<p>代码如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">location / &#123;</span><br><span class="line">  proxy_pass http://127.0.0.1:8090/;       </span><br><span class="line">  rewrite ^/(.*)$ /$1 break;</span><br><span class="line">  proxy_redirect off;</span><br><span class="line">  proxy_set_header Host $host;</span><br><span class="line">  proxy_set_header X-Forwarded-Proto $scheme;</span><br><span class="line">  proxy_set_header X-Real-IP $remote_addr;</span><br><span class="line">  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;</span><br><span class="line">  proxy_set_header Upgrade-Insecure-Requests 1;</span><br><span class="line">  proxy_set_header X-Forwarded-Proto https;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>此方法对 90% 的反向代理都能生效，然后就可以用域名来安装访问了。</p>
+<p>有同学可能会问，为什么不直接用宝塔自带的反向代理功能。</p>
+<p>也可以，不过咕咕自己之前遇到过当有多个网站需要反代的时候，在这边设置会报错的情况 &#x3D; &#x3D;</p>
+<p>所以后来就不用了，直接用上面的方法来操作了。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p>文档地址：<a href="http://docs.halo.run/" title="http://docs.halo.run/"></a><a href="http://docs.halo.run/" title="http://docs.halo.run/">http://docs.halo.run/</a><br>社区地址：<a href="https://bbs.halo.run/" title="https://bbs.halo.run/"></a><a href="https://bbs.halo.run/" title="https://bbs.halo.run/">https://bbs.halo.run/</a><br>官网地址：<a href="https://halo.run/" title="https://halo.run/"></a><a href="https://halo.run/" title="https://halo.run/">https://halo.run/</a><br>GitHub地址：<a href="https://github.com/halo-dev/halo" title="https://github.com/halo-dev/halo"></a><a href="https://github.com/halo-dev/halo" title="https://github.com/halo-dev/halo">https://github.com/halo-dev/halo</a></p>
+]]></content>
+      <categories>
+        <category>docker</category>
+      </categories>
+      <tags>
+        <tag>blog</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>在线工具——it-tools</title>
+    <url>/undefined/565989/</url>
+    <content><![CDATA[<p>IT-Tools是一个广受好评的开源Docker应用，专为IT专业人士设计，集成了多种实用的在线工具，极大地提升了日常工作的效率。以下是关于IT-Tools的详细介绍：</p>
+<h2 id="主要特点："><a href="#主要特点：" class="headerlink" title="主要特点："></a>主要特点：</h2><ul>
+<li><strong>集成工具箱</strong>：包含多种实用功能，如二维码生成、数据格式转换（如JSON、XML、YAML等）、MAC地址生成、加密解密（包括Token生成、UUID生成）、以及“Docker run转Docker Compose”等功能，满足开发者和IT运维人员的多样化需求。</li>
+<li><strong>易部署性</strong>：通过Docker容器化部署，使得设置和运行变得极其简单快捷，无论是在本地服务器、云端还是诸如NAS设备上都能轻松部署。</li>
+<li><strong>持续更新与维护</strong>：作为一个活跃的开源项目，IT-Tools在GitHub上获得了较高的关注度（例如，有4.7K星），意味着它得到了社区的支持，持续接收新功能和漏洞修复。</li>
+<li><strong>用户友好的界面</strong>：提供了直观的Web界面，使得操作这些工具变得更加便捷，无需复杂的命令行操作，即便是非技术背景的用户也能快速上手。</li>
+</ul>
+<h2 id="创建目录"><a href="#创建目录" class="headerlink" title="创建目录"></a>创建目录</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mkdir -p /root/data/docker_data/it-tools  </span><br><span class="line"></span><br><span class="line">cd /root/data/docker_data/it-tools</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">vim docker-compose.yml</span><br></pre></td></tr></table></figure>
+
+<h2 id="docker-compose-yml文件"><a href="#docker-compose-yml文件" class="headerlink" title="docker-compose.yml文件"></a>docker-compose.yml文件</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">version: &#x27;3.3&#x27;  </span><br><span class="line">services:  </span><br><span class="line">    it-tools:  </span><br><span class="line">        container_name: it-tools  </span><br><span class="line">        restart: unless-stopped  </span><br><span class="line">        ports:  </span><br><span class="line">            - &#x27;8330:80&#x27;  #8380可以修改成服务器上未使用过的其他端口  </span><br><span class="line">        image: &#x27;corentinth/it-tools:latest&#x27;</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker-compose up -d</span><br></pre></td></tr></table></figure>
+
+<h2 id="更新"><a href="#更新" class="headerlink" title="更新"></a>更新</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cd /root/data/docker_data/it-tools  </span><br><span class="line">  </span><br><span class="line">docker-compose pull  </span><br><span class="line">  </span><br><span class="line">docker-compose up -d    # 请不要使用 docker-compose stop 来停止容器，因为这么做需要额外的时间等待容器停止；docker-compose up -d 直接升级容器时会自动停止并立刻重建新的容器，完全没有必要浪费那些时间。  </span><br><span class="line">  </span><br><span class="line">docker image prune  # prune 命令用来删除不再使用的 docker 对象。删除所有未被 tag 标记和未被容器使用的镜像</span><br></pre></td></tr></table></figure>
+
+<h2 id="成果展示"><a href="#成果展示" class="headerlink" title="成果展示"></a>成果展示</h2><p><img src="https://picgo-1321316737.cos.ap-guangzhou.myqcloud.com/img/20240513144412.png"></p>
+]]></content>
+      <categories>
+        <category>docker</category>
+      </categories>
+      <tags>
+        <tag>docker</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>图床——picsur</title>
+    <url>/undefined/8972656/</url>
+    <content><![CDATA[<p>Picsur 是一个基于 Docker 部署的自托管图像共享服务。其主要特点包括：</p>
+<ol>
+<li><strong>自托管</strong>: 用户完全掌控数据与服务，保障隐私与安全。</li>
+<li><strong>Docker化部署</strong>: 极大简化安装与运维流程，跨平台运行无障碍。</li>
+<li><strong>集成数据库</strong>: 通常与PostgreSQL数据库结合使用，确保数据持久化与性能。</li>
+<li><strong>可定制性</strong>: 通过调整<code>docker-compose.yml</code>配置，满足不同场景需求。</li>
+<li><strong>资源共享</strong>: 便于在团队或社区内共享图片资源，提升协作效率。</li>
+</ol>
+<p>试过一次，不能批量上传，这个真的很不好！</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo -i  </span><br><span class="line">  </span><br><span class="line">mkdir -p /root/data/docker_data/picsur  </span><br><span class="line">  </span><br><span class="line">cd /root/data/docker_data/picsur</span><br><span class="line"></span><br><span class="line">vim docker-compose.yml</span><br></pre></td></tr></table></figure>
+
+<p>docker-compose.yml文件：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">version: &#x27;3&#x27;  </span><br><span class="line">services:  </span><br><span class="line">  picsur:  </span><br><span class="line">    image: ghcr.io/caramelfur/picsur:latest  </span><br><span class="line">    container_name: picsur  </span><br><span class="line">    ports:  </span><br><span class="line">      - &#x27;9650:8080&#x27; #8003可以改成服务器上没有用过的端口  </span><br><span class="line">    environment:  </span><br><span class="line">      PICSUR_HOST: &#x27;0.0.0.0&#x27;  </span><br><span class="line">      PICSUR_PORT: 8080  </span><br><span class="line">      PICSUR_DB_HOST: picsur_postgres  </span><br><span class="line">      PICSUR_DB_PORT: 5432  </span><br><span class="line">      PICSUR_DB_USERNAME: picsur  </span><br><span class="line">      PICSUR_DB_PASSWORD: SAJFJAjsdkfjakfj  # 确保和picsur_postgres:部分的 POSTGRES_PASSWORD 匹配  </span><br><span class="line">      PICSUR_DB_DATABASE: picsur  </span><br><span class="line">  </span><br><span class="line">      ## 默认管理员账户是 admin, 这个没法改，密码就是下面这个你设置的  </span><br><span class="line">      PICSUR_ADMIN_PASSWORD: 0907DAI.dai         </span><br><span class="line">  </span><br><span class="line">      ## 可选的，如果没有设置会默认生产随机字符  </span><br><span class="line">      # PICSUR_JWT_SECRET: CHANGE_ME  </span><br><span class="line">      # PICSUR_JWT_EXPIRY: 7d  </span><br><span class="line">        </span><br><span class="line">      ## 最大可以上传的字节数  </span><br><span class="line">      PICSUR_MAX_FILE_SIZE: 128000000  # 128 MB  </span><br><span class="line">      ## No need to touch this, unless you use a custom frontend  </span><br><span class="line">      # PICSUR_STATIC_FRONTEND_ROOT: &quot;/picsur/frontend/dist&quot;  </span><br><span class="line">  </span><br><span class="line">      ## Warning: Verbose mode might log sensitive data  </span><br><span class="line">      # PICSUR_VERBOSE: &quot;true&quot;  </span><br><span class="line">    restart: unless-stopped  </span><br><span class="line">      </span><br><span class="line">  picsur_postgres:  </span><br><span class="line">    image: postgres:14-alpine  </span><br><span class="line">    container_name: picsur_postgres  </span><br><span class="line">    environment:  </span><br><span class="line">      POSTGRES_DB: picsur  </span><br><span class="line">      POSTGRES_PASSWORD: SAJFJAjsdkfjakfj  </span><br><span class="line">      POSTGRES_USER: picsur  </span><br><span class="line">    restart: unless-stopped  </span><br><span class="line">    volumes:  </span><br><span class="line">      - ./picsur-data:/var/lib/postgresql/data  # 默认数据存放在当前文件夹下的picsur-data目录中，可以自行修改</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker-compose up -d</span><br></pre></td></tr></table></figure>
+
+<p>停止容器：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker-compose down</span><br></pre></td></tr></table></figure>
+
+<p>完全删除容器：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">rm -rf /root/data/docker_data/picsur</span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>docker</category>
+      </categories>
+      <tags>
+        <tag>docker</tag>
+        <tag>图床</tag>
       </tags>
   </entry>
 </search>
