@@ -204,51 +204,6 @@
       </tags>
   </entry>
   <entry>
-    <title>nginx proxy manager安装</title>
-    <url>/undefined/null/</url>
-    <content><![CDATA[<p>图示：<br><img src="https://picgo-1321316737.cos.ap-guangzhou.myqcloud.com/img/20240513145119.png"></p>
-<h2 id="1、主要特点："><a href="#1、主要特点：" class="headerlink" title="1、主要特点："></a>1、主要特点：</h2><ol>
-<li><strong>图形化界面</strong>：提供用户友好的Web界面，允许用户通过点选和表单填写的方式而非手动编辑Nginx配置文件来配置反向代理规则、上游服务器、重定向、SSL证书等，大大降低了配置Nginx的难度。</li>
-<li><strong>自动化SSL证书管理</strong>：无缝集成 Let’s Encrypt，支持一键申请、自动续期 SSL 证书，确保网站安全访问。</li>
-<li><strong>域名和路径基础的路由</strong>：用户可以基于不同的域名或路径设置反向代理规则，实现精细的流量控制。</li>
-<li><strong>Docker集成</strong>：Nginx Proxy Manager 本身设计为Docker镜像，易于部署和升级。通过Docker Compose，可以在几分钟内快速搭建起来，适用于从个人开发者到企业的各种场景。</li>
-<li><strong>多用户支持</strong>：可创建多个用户账户，分配不同的权限，适合团队协作。</li>
-<li><strong>灵活的日志记录</strong>：提供访问日志查看功能，便于监控和故障排查。</li>
-<li><strong>高级功能</strong>：支持WebSocket、HTTP&#x2F;2、ACME DNS验证等多种高级特性。</li>
-</ol>
-<h2 id="创建安装目录"><a href="#创建安装目录" class="headerlink" title="创建安装目录"></a>创建安装目录</h2><p>创建一下安装的目录：  </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo -i  </span><br><span class="line">  </span><br><span class="line">mkdir -p /root/data/docker_data/npm  </span><br><span class="line">  </span><br><span class="line">cd /root/data/docker_data/npm  </span><br></pre></td></tr></table></figure>
-
-<p>这边我们直接用docker，参考这篇文章（ [[03、docker and docker compose]]）的方式安装。  </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">vim docker-compose.yml </span><br><span class="line">```  </span><br><span class="line"> </span><br><span class="line">英文输入法下，按 i </span><br></pre></td></tr></table></figure>
-<p>version: ‘3’<br>services:<br>  app:<br>    image: ‘jc21&#x2F;nginx-proxy-manager:latest’<br>    restart: unless-stopped<br>    ports:<br>      - ‘80:80’  # 冒号左边可以改成自己服务器未被占用的端口<br>      - ‘81:81’  # 冒号左边可以改成自己服务器未被占用的端口<br>      - ‘443:443’ # 冒号左边可以改成自己服务器未被占用的端口<br>    volumes:<br>      - .&#x2F;data:&#x2F;data # 冒号左边可以改路径，现在是表示把数据存放在在当前文件夹下的 data 文件夹中<br>      - .&#x2F;letsencrypt:&#x2F;etc&#x2F;letsencrypt  # 冒号左边可以改路径，现在是表示把数据存放在在当前文件夹下的 letsencrypt 文件夹中  </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">按一下 esc，然后 :wq 保存退出，之后，  </span><br><span class="line">  </span><br><span class="line">查看端口是否被占用（以 81 为例），输入：  </span><br><span class="line">  </span><br><span class="line">lsof -i:81  # 查看 81 端口是否被占用，如果被占用，重新自定义一个端口  </span><br><span class="line">如果啥也没出现，表示端口未被占用，我们可以继续下面的操作了～  </span><br><span class="line">  </span><br><span class="line">如果出现：  </span><br><span class="line">  </span><br><span class="line">-bash: lsof: command not found  </span><br><span class="line">运行：  </span><br><span class="line">  </span><br><span class="line">apt install lsof  # 安装 lsof  </span><br><span class="line">如果端口没有被占用（被占用了就修改一下端口，比如改成 82，注意 docker 命令行里和防火墙都要改）  </span><br><span class="line">  </span><br><span class="line">运行并访问 Nginx Proxy Manager  </span><br><span class="line">最后：  </span><br></pre></td></tr></table></figure>
-<p>cd &#x2F;root&#x2F;data&#x2F;docker_data&#x2F;npm   # 来到 dockercompose 文件所在的文件夹下  </p>
-<p>docker-compose up -d   </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">理论上我们就可以输入 http://ip:81 访问了。  </span><br><span class="line">  </span><br><span class="line">默认登陆名和密码：  </span><br><span class="line">  </span><br><span class="line">Email:    admin@example.com  </span><br><span class="line">Password: changeme  </span><br><span class="line"></span><br><span class="line">注意：  </span><br><span class="line">  </span><br><span class="line">1、不知道服务器 IP，可以直接在命令行输入：curl ip.sb，会显示当前服务器的 IP。  </span><br><span class="line">  </span><br><span class="line">2、遇到访问不了的情况，请再次检查在宝塔面板的防火墙和服务商的后台防火墙是否打开对应了端口。  </span><br><span class="line">  </span><br><span class="line">## 更新 Nginx Proxy Manager  </span><br></pre></td></tr></table></figure>
-<p>cd &#x2F;root&#x2F;data&#x2F;docker_data&#x2F;npm  </p>
-<p>docker-compose down   </p>
-<p>cp -r &#x2F;root&#x2F;data&#x2F;docker_data&#x2F;npm &#x2F;root&#x2F;data&#x2F;docker_data&#x2F;npm.archive  # 万事先备份，以防万一  </p>
-<p>docker-compose pull  </p>
-<p>docker-compose up -d      </p>
-<p>docker image prune  # prune 命令用来删除不再使用的 docker 对象。删除所有未被 tag 标记和未被容器使用的镜像  </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">提示：  </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">WARNING! This will remove all dangling images.  </span><br><span class="line">Are you sure you want to continue? [y/N]   </span><br><span class="line">输入 y  </span><br><span class="line">  </span><br><span class="line">利用 Docker 搭建的应用，更新非常容易</span><br><span class="line">  </span><br><span class="line">## 卸载 Nginx Proxy Manager  </span><br></pre></td></tr></table></figure>
-<p>cd &#x2F;root&#x2F;data&#x2F;docker_data&#x2F;npm  </p>
-<p>docker-compose down   </p>
-<p>rm -rf &#x2F;root&#x2F;data&#x2F;docker_data&#x2F;npm  # 完全删除映射到本地的数据  </p>
-<pre><code>
-可以卸载得很干净。
-</code></pre>
-]]></content>
-      <categories>
-        <category>dockers</category>
-      </categories>
-      <tags>
-        <tag>docker</tag>
-        <tag>npm</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>整理一些常用的脚本</title>
     <url>/undefined/91208508/</url>
     <content><![CDATA[<p>Halo 2.0是一款基于Spring Boot和Vue.js框架构建的现代化开源内容管理系统（CMS），专为个人博客及小型网站设计。作为一款开源软件，Halo不仅代码开放，而且完全免费，这意味着用户可以自由地查看、修改源代码以适应个性化需求，同时也能够享受到社区的支持和持续的更新。</p>
@@ -363,6 +318,51 @@
       <tags>
         <tag>docker</tag>
         <tag>blog</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>nginx proxy manager安装</title>
+    <url>/undefined/null/</url>
+    <content><![CDATA[<p>图示：<br><img src="https://picgo-1321316737.cos.ap-guangzhou.myqcloud.com/img/20240513145119.png"></p>
+<h2 id="1、主要特点："><a href="#1、主要特点：" class="headerlink" title="1、主要特点："></a>1、主要特点：</h2><ol>
+<li><strong>图形化界面</strong>：提供用户友好的Web界面，允许用户通过点选和表单填写的方式而非手动编辑Nginx配置文件来配置反向代理规则、上游服务器、重定向、SSL证书等，大大降低了配置Nginx的难度。</li>
+<li><strong>自动化SSL证书管理</strong>：无缝集成 Let’s Encrypt，支持一键申请、自动续期 SSL 证书，确保网站安全访问。</li>
+<li><strong>域名和路径基础的路由</strong>：用户可以基于不同的域名或路径设置反向代理规则，实现精细的流量控制。</li>
+<li><strong>Docker集成</strong>：Nginx Proxy Manager 本身设计为Docker镜像，易于部署和升级。通过Docker Compose，可以在几分钟内快速搭建起来，适用于从个人开发者到企业的各种场景。</li>
+<li><strong>多用户支持</strong>：可创建多个用户账户，分配不同的权限，适合团队协作。</li>
+<li><strong>灵活的日志记录</strong>：提供访问日志查看功能，便于监控和故障排查。</li>
+<li><strong>高级功能</strong>：支持WebSocket、HTTP&#x2F;2、ACME DNS验证等多种高级特性。</li>
+</ol>
+<h2 id="创建安装目录"><a href="#创建安装目录" class="headerlink" title="创建安装目录"></a>创建安装目录</h2><p>创建一下安装的目录：  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo -i  </span><br><span class="line">  </span><br><span class="line">mkdir -p /root/data/docker_data/npm  </span><br><span class="line">  </span><br><span class="line">cd /root/data/docker_data/npm  </span><br></pre></td></tr></table></figure>
+
+<p>这边我们直接用docker，参考这篇文章（ [[03、docker and docker compose]]）的方式安装。  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">vim docker-compose.yml </span><br><span class="line">```  </span><br><span class="line"> </span><br><span class="line">英文输入法下，按 i </span><br></pre></td></tr></table></figure>
+<p>version: ‘3’<br>services:<br>  app:<br>    image: ‘jc21&#x2F;nginx-proxy-manager:latest’<br>    restart: unless-stopped<br>    ports:<br>      - ‘80:80’  # 冒号左边可以改成自己服务器未被占用的端口<br>      - ‘81:81’  # 冒号左边可以改成自己服务器未被占用的端口<br>      - ‘443:443’ # 冒号左边可以改成自己服务器未被占用的端口<br>    volumes:<br>      - .&#x2F;data:&#x2F;data # 冒号左边可以改路径，现在是表示把数据存放在在当前文件夹下的 data 文件夹中<br>      - .&#x2F;letsencrypt:&#x2F;etc&#x2F;letsencrypt  # 冒号左边可以改路径，现在是表示把数据存放在在当前文件夹下的 letsencrypt 文件夹中  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">按一下 esc，然后 :wq 保存退出，之后，  </span><br><span class="line">  </span><br><span class="line">查看端口是否被占用（以 81 为例），输入：  </span><br><span class="line">  </span><br><span class="line">lsof -i:81  # 查看 81 端口是否被占用，如果被占用，重新自定义一个端口  </span><br><span class="line">如果啥也没出现，表示端口未被占用，我们可以继续下面的操作了～  </span><br><span class="line">  </span><br><span class="line">如果出现：  </span><br><span class="line">  </span><br><span class="line">-bash: lsof: command not found  </span><br><span class="line">运行：  </span><br><span class="line">  </span><br><span class="line">apt install lsof  # 安装 lsof  </span><br><span class="line">如果端口没有被占用（被占用了就修改一下端口，比如改成 82，注意 docker 命令行里和防火墙都要改）  </span><br><span class="line">  </span><br><span class="line">运行并访问 Nginx Proxy Manager  </span><br><span class="line">最后：  </span><br></pre></td></tr></table></figure>
+<p>cd &#x2F;root&#x2F;data&#x2F;docker_data&#x2F;npm   # 来到 dockercompose 文件所在的文件夹下  </p>
+<p>docker-compose up -d   </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">理论上我们就可以输入 http://ip:81 访问了。  </span><br><span class="line">  </span><br><span class="line">默认登陆名和密码：  </span><br><span class="line">  </span><br><span class="line">Email:    admin@example.com  </span><br><span class="line">Password: changeme  </span><br><span class="line"></span><br><span class="line">注意：  </span><br><span class="line">  </span><br><span class="line">1、不知道服务器 IP，可以直接在命令行输入：curl ip.sb，会显示当前服务器的 IP。  </span><br><span class="line">  </span><br><span class="line">2、遇到访问不了的情况，请再次检查在宝塔面板的防火墙和服务商的后台防火墙是否打开对应了端口。  </span><br><span class="line">  </span><br><span class="line">## 更新 Nginx Proxy Manager  </span><br></pre></td></tr></table></figure>
+<p>cd &#x2F;root&#x2F;data&#x2F;docker_data&#x2F;npm  </p>
+<p>docker-compose down   </p>
+<p>cp -r &#x2F;root&#x2F;data&#x2F;docker_data&#x2F;npm &#x2F;root&#x2F;data&#x2F;docker_data&#x2F;npm.archive  # 万事先备份，以防万一  </p>
+<p>docker-compose pull  </p>
+<p>docker-compose up -d      </p>
+<p>docker image prune  # prune 命令用来删除不再使用的 docker 对象。删除所有未被 tag 标记和未被容器使用的镜像  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">提示：  </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">WARNING! This will remove all dangling images.  </span><br><span class="line">Are you sure you want to continue? [y/N]   </span><br><span class="line">输入 y  </span><br><span class="line">  </span><br><span class="line">利用 Docker 搭建的应用，更新非常容易</span><br><span class="line">  </span><br><span class="line">## 卸载 Nginx Proxy Manager  </span><br></pre></td></tr></table></figure>
+<p>cd &#x2F;root&#x2F;data&#x2F;docker_data&#x2F;npm  </p>
+<p>docker-compose down   </p>
+<p>rm -rf &#x2F;root&#x2F;data&#x2F;docker_data&#x2F;npm  # 完全删除映射到本地的数据  </p>
+<pre><code>
+可以卸载得很干净。
+</code></pre>
+]]></content>
+      <categories>
+        <category>dockers</category>
+      </categories>
+      <tags>
+        <tag>docker</tag>
+        <tag>npm</tag>
       </tags>
   </entry>
   <entry>
@@ -705,6 +705,48 @@
       </tags>
   </entry>
   <entry>
+    <title>网站流量统计工具 -Plausible</title>
+    <url>/undefined/a0a38a3f/</url>
+    <content><![CDATA[<p>Plausible是一款轻量级、开源的网页分析工具，通过Docker部署时，其核心特点包括：</p>
+<ol>
+<li><strong>隐私优先</strong>：注重用户隐私，不使用cookies，遵守GDPR和CMPA标准。</li>
+<li><strong>轻量化</strong>：对网站性能影响小，加载速度快，无第三方跟踪。</li>
+<li><strong>易于部署</strong>：借助Docker，快速启动和配置，实现无缝部署。</li>
+<li><strong>数据实时</strong>：提供实时访客统计，即时洞察网站流量动态。</li>
+<li><strong>自托管</strong>：数据由用户自己掌控，增强数据安全与自主性。</li>
+<li><strong>界面直观</strong>：简洁的仪表板展示关键指标，便于数据分析。</li>
+</ol>
+<p>创建一下安装的目录：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mkdir -p /root/data/docker_data/plausible</span><br><span class="line"></span><br><span class="line">cd /root/data/docker_data/plausible</span><br><span class="line"></span><br><span class="line">git clone https://github.com/plausible/hosting</span><br><span class="line"></span><br><span class="line">cd hosting</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">vim docker-compose.yml</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">version: &quot;3.3&quot;</span><br><span class="line">services:</span><br><span class="line">  mail:</span><br><span class="line">    image: bytemark/smtp</span><br><span class="line">    restart: always</span><br><span class="line"></span><br><span class="line">  plausible_db:</span><br><span class="line">    # supported versions are 12, 13, and 14</span><br><span class="line">    image: postgres:14-alpine</span><br><span class="line">    restart: always</span><br><span class="line">    volumes:</span><br><span class="line">      - ./db-data:/var/lib/postgresql/data</span><br><span class="line">    environment:</span><br><span class="line">      - POSTGRES_PASSWORD=postgres</span><br><span class="line"></span><br><span class="line">  plausible_events_db:</span><br><span class="line">    image: clickhouse/clickhouse-server:23.3.7.5-alpine</span><br><span class="line">    restart: always</span><br><span class="line">    volumes:</span><br><span class="line">      - ./event-data:/var/lib/clickhouse</span><br><span class="line">      - ./clickhouse/clickhouse-config.xml:/etc/clickhouse-server/config.d/logging.xml:ro</span><br><span class="line">      - ./clickhouse/clickhouse-user-config.xml:/etc/clickhouse-server/users.d/logging.xml:ro</span><br><span class="line">    ulimits:</span><br><span class="line">      nofile:</span><br><span class="line">        soft: 262144</span><br><span class="line">        hard: 262144</span><br><span class="line"></span><br><span class="line">  plausible:</span><br><span class="line">    image: plausible/analytics:v2.0</span><br><span class="line">    restart: always</span><br><span class="line">    command: sh -c &quot;sleep 10 &amp;&amp; /entrypoint.sh db createdb &amp;&amp; /entrypoint.sh db migrate &amp;&amp; /entrypoint.sh run&quot;</span><br><span class="line">    depends_on:</span><br><span class="line">      - plausible_db</span><br><span class="line">      - plausible_events_db</span><br><span class="line">      - mail</span><br><span class="line">    ports:</span><br><span class="line">      - 8080:8000     # 左边端口号随便改</span><br><span class="line">    env_file:</span><br><span class="line">      - plausible-conf.env</span><br></pre></td></tr></table></figure>
+
+<p>生成密钥：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">openssl rand -base64 64 | tr -d &#x27;\n&#x27; ; echo</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">vim plausible-conf.env</span><br></pre></td></tr></table></figure>
+
+
+<p>BASE_URL&#x3D;<a href="https://xxxxxxxxxxx/">https://xxxxxxxxxxx</a><br>(密钥)SECRET_KEY_BASE&#x3D;xxxxxxxxxxxxxxxxxxxxxx</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker-compose up -d</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+]]></content>
+      <categories>
+        <category>dockers</category>
+      </categories>
+      <tags>
+        <tag>docker</tag>
+        <tag>监控</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>整理一些常用的脚本</title>
     <url>/undefined/91208508/</url>
     <content><![CDATA[<h2 id="更新列表"><a href="#更新列表" class="headerlink" title="更新列表"></a>更新列表</h2><p>2023-0525 检测是否可以访问ChatGPT<a href="https://iwanlab.com/tag/%e8%84%9a%e6%9c%ac/" title="脚本">脚本</a> <a href="https://github.com/moeakwak/chatgpt-web-share/wiki/%E4%B8%AD%E6%96%87%E6%8C%87%E5%8D%97">来源</a></p>
@@ -952,48 +994,6 @@
       </tags>
   </entry>
   <entry>
-    <title>网站流量统计工具 -Plausible</title>
-    <url>/undefined/a0a38a3f/</url>
-    <content><![CDATA[<p>Plausible是一款轻量级、开源的网页分析工具，通过Docker部署时，其核心特点包括：</p>
-<ol>
-<li><strong>隐私优先</strong>：注重用户隐私，不使用cookies，遵守GDPR和CMPA标准。</li>
-<li><strong>轻量化</strong>：对网站性能影响小，加载速度快，无第三方跟踪。</li>
-<li><strong>易于部署</strong>：借助Docker，快速启动和配置，实现无缝部署。</li>
-<li><strong>数据实时</strong>：提供实时访客统计，即时洞察网站流量动态。</li>
-<li><strong>自托管</strong>：数据由用户自己掌控，增强数据安全与自主性。</li>
-<li><strong>界面直观</strong>：简洁的仪表板展示关键指标，便于数据分析。</li>
-</ol>
-<p>创建一下安装的目录：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mkdir -p /root/data/docker_data/plausible</span><br><span class="line"></span><br><span class="line">cd /root/data/docker_data/plausible</span><br><span class="line"></span><br><span class="line">git clone https://github.com/plausible/hosting</span><br><span class="line"></span><br><span class="line">cd hosting</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">vim docker-compose.yml</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">version: &quot;3.3&quot;</span><br><span class="line">services:</span><br><span class="line">  mail:</span><br><span class="line">    image: bytemark/smtp</span><br><span class="line">    restart: always</span><br><span class="line"></span><br><span class="line">  plausible_db:</span><br><span class="line">    # supported versions are 12, 13, and 14</span><br><span class="line">    image: postgres:14-alpine</span><br><span class="line">    restart: always</span><br><span class="line">    volumes:</span><br><span class="line">      - ./db-data:/var/lib/postgresql/data</span><br><span class="line">    environment:</span><br><span class="line">      - POSTGRES_PASSWORD=postgres</span><br><span class="line"></span><br><span class="line">  plausible_events_db:</span><br><span class="line">    image: clickhouse/clickhouse-server:23.3.7.5-alpine</span><br><span class="line">    restart: always</span><br><span class="line">    volumes:</span><br><span class="line">      - ./event-data:/var/lib/clickhouse</span><br><span class="line">      - ./clickhouse/clickhouse-config.xml:/etc/clickhouse-server/config.d/logging.xml:ro</span><br><span class="line">      - ./clickhouse/clickhouse-user-config.xml:/etc/clickhouse-server/users.d/logging.xml:ro</span><br><span class="line">    ulimits:</span><br><span class="line">      nofile:</span><br><span class="line">        soft: 262144</span><br><span class="line">        hard: 262144</span><br><span class="line"></span><br><span class="line">  plausible:</span><br><span class="line">    image: plausible/analytics:v2.0</span><br><span class="line">    restart: always</span><br><span class="line">    command: sh -c &quot;sleep 10 &amp;&amp; /entrypoint.sh db createdb &amp;&amp; /entrypoint.sh db migrate &amp;&amp; /entrypoint.sh run&quot;</span><br><span class="line">    depends_on:</span><br><span class="line">      - plausible_db</span><br><span class="line">      - plausible_events_db</span><br><span class="line">      - mail</span><br><span class="line">    ports:</span><br><span class="line">      - 8080:8000     # 左边端口号随便改</span><br><span class="line">    env_file:</span><br><span class="line">      - plausible-conf.env</span><br></pre></td></tr></table></figure>
-
-<p>生成密钥：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">openssl rand -base64 64 | tr -d &#x27;\n&#x27; ; echo</span><br></pre></td></tr></table></figure>
-
-
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">vim plausible-conf.env</span><br></pre></td></tr></table></figure>
-
-
-<p>BASE_URL&#x3D;<a href="https://xxxxxxxxxxx/">https://xxxxxxxxxxx</a><br>(密钥)SECRET_KEY_BASE&#x3D;xxxxxxxxxxxxxxxxxxxxxx</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker-compose up -d</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-]]></content>
-      <categories>
-        <category>dockers</category>
-      </categories>
-      <tags>
-        <tag>docker</tag>
-        <tag>监控</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>个人博客-Halo 2.0</title>
     <url>/undefined/91208508/</url>
     <content><![CDATA[<p>Halo 2.0是一款基于Spring Boot和Vue.js框架构建的现代化开源内容管理系统（CMS），专为个人博客及小型网站设计。作为一款开源软件，Halo不仅代码开放，而且完全免费，这意味着用户可以自由地查看、修改源代码以适应个性化需求，同时也能够享受到社区的支持和持续的更新。</p>
@@ -1102,6 +1102,36 @@
       </tags>
   </entry>
   <entry>
+    <title>在线工具——it-tools</title>
+    <url>/undefined/565989/</url>
+    <content><![CDATA[<p>IT-Tools是一个广受好评的开源Docker应用，专为IT专业人士设计，集成了多种实用的在线工具，极大地提升了日常工作的效率。以下是关于IT-Tools的详细介绍：</p>
+<h2 id="主要特点："><a href="#主要特点：" class="headerlink" title="主要特点："></a>主要特点：</h2><ul>
+<li><strong>集成工具箱</strong>：包含多种实用功能，如二维码生成、数据格式转换（如JSON、XML、YAML等）、MAC地址生成、加密解密（包括Token生成、UUID生成）、以及“Docker run转Docker Compose”等功能，满足开发者和IT运维人员的多样化需求。</li>
+<li><strong>易部署性</strong>：通过Docker容器化部署，使得设置和运行变得极其简单快捷，无论是在本地服务器、云端还是诸如NAS设备上都能轻松部署。</li>
+<li><strong>持续更新与维护</strong>：作为一个活跃的开源项目，IT-Tools在GitHub上获得了较高的关注度（例如，有4.7K星），意味着它得到了社区的支持，持续接收新功能和漏洞修复。</li>
+<li><strong>用户友好的界面</strong>：提供了直观的Web界面，使得操作这些工具变得更加便捷，无需复杂的命令行操作，即便是非技术背景的用户也能快速上手。</li>
+</ul>
+<h2 id="创建目录"><a href="#创建目录" class="headerlink" title="创建目录"></a>创建目录</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mkdir -p /root/data/docker_data/it-tools  </span><br><span class="line"></span><br><span class="line">cd /root/data/docker_data/it-tools</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">vim docker-compose.yml</span><br></pre></td></tr></table></figure>
+
+<h2 id="docker-compose-yml文件"><a href="#docker-compose-yml文件" class="headerlink" title="docker-compose.yml文件"></a>docker-compose.yml文件</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">version: &#x27;3.3&#x27;  </span><br><span class="line">services:  </span><br><span class="line">    it-tools:  </span><br><span class="line">        container_name: it-tools  </span><br><span class="line">        restart: unless-stopped  </span><br><span class="line">        ports:  </span><br><span class="line">            - &#x27;8330:80&#x27;  #8380可以修改成服务器上未使用过的其他端口  </span><br><span class="line">        image: &#x27;corentinth/it-tools:latest&#x27;</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker-compose up -d</span><br></pre></td></tr></table></figure>
+
+<h2 id="更新"><a href="#更新" class="headerlink" title="更新"></a>更新</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cd /root/data/docker_data/it-tools  </span><br><span class="line">  </span><br><span class="line">docker-compose pull  </span><br><span class="line">  </span><br><span class="line">docker-compose up -d    # 请不要使用 docker-compose stop 来停止容器，因为这么做需要额外的时间等待容器停止；docker-compose up -d 直接升级容器时会自动停止并立刻重建新的容器，完全没有必要浪费那些时间。  </span><br><span class="line">  </span><br><span class="line">docker image prune  # prune 命令用来删除不再使用的 docker 对象。删除所有未被 tag 标记和未被容器使用的镜像</span><br></pre></td></tr></table></figure>
+
+<h2 id="成果展示"><a href="#成果展示" class="headerlink" title="成果展示"></a>成果展示</h2><p><img src="https://picgo-1321316737.cos.ap-guangzhou.myqcloud.com/img/20240513144412.png"></p>
+]]></content>
+      <categories>
+        <category>docker</category>
+      </categories>
+      <tags>
+        <tag>docker</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>哪吒监控面板——nezha</title>
     <url>/undefined/569783/</url>
     <content><![CDATA[<p>哪吒监控面板是一个开源的 Docker 应用，它的特点包括：</p>
@@ -1143,36 +1173,6 @@
       <tags>
         <tag>docker</tag>
         <tag>监控</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>在线工具——it-tools</title>
-    <url>/undefined/565989/</url>
-    <content><![CDATA[<p>IT-Tools是一个广受好评的开源Docker应用，专为IT专业人士设计，集成了多种实用的在线工具，极大地提升了日常工作的效率。以下是关于IT-Tools的详细介绍：</p>
-<h2 id="主要特点："><a href="#主要特点：" class="headerlink" title="主要特点："></a>主要特点：</h2><ul>
-<li><strong>集成工具箱</strong>：包含多种实用功能，如二维码生成、数据格式转换（如JSON、XML、YAML等）、MAC地址生成、加密解密（包括Token生成、UUID生成）、以及“Docker run转Docker Compose”等功能，满足开发者和IT运维人员的多样化需求。</li>
-<li><strong>易部署性</strong>：通过Docker容器化部署，使得设置和运行变得极其简单快捷，无论是在本地服务器、云端还是诸如NAS设备上都能轻松部署。</li>
-<li><strong>持续更新与维护</strong>：作为一个活跃的开源项目，IT-Tools在GitHub上获得了较高的关注度（例如，有4.7K星），意味着它得到了社区的支持，持续接收新功能和漏洞修复。</li>
-<li><strong>用户友好的界面</strong>：提供了直观的Web界面，使得操作这些工具变得更加便捷，无需复杂的命令行操作，即便是非技术背景的用户也能快速上手。</li>
-</ul>
-<h2 id="创建目录"><a href="#创建目录" class="headerlink" title="创建目录"></a>创建目录</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mkdir -p /root/data/docker_data/it-tools  </span><br><span class="line"></span><br><span class="line">cd /root/data/docker_data/it-tools</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">vim docker-compose.yml</span><br></pre></td></tr></table></figure>
-
-<h2 id="docker-compose-yml文件"><a href="#docker-compose-yml文件" class="headerlink" title="docker-compose.yml文件"></a>docker-compose.yml文件</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">version: &#x27;3.3&#x27;  </span><br><span class="line">services:  </span><br><span class="line">    it-tools:  </span><br><span class="line">        container_name: it-tools  </span><br><span class="line">        restart: unless-stopped  </span><br><span class="line">        ports:  </span><br><span class="line">            - &#x27;8330:80&#x27;  #8380可以修改成服务器上未使用过的其他端口  </span><br><span class="line">        image: &#x27;corentinth/it-tools:latest&#x27;</span><br></pre></td></tr></table></figure>
-
-
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker-compose up -d</span><br></pre></td></tr></table></figure>
-
-<h2 id="更新"><a href="#更新" class="headerlink" title="更新"></a>更新</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cd /root/data/docker_data/it-tools  </span><br><span class="line">  </span><br><span class="line">docker-compose pull  </span><br><span class="line">  </span><br><span class="line">docker-compose up -d    # 请不要使用 docker-compose stop 来停止容器，因为这么做需要额外的时间等待容器停止；docker-compose up -d 直接升级容器时会自动停止并立刻重建新的容器，完全没有必要浪费那些时间。  </span><br><span class="line">  </span><br><span class="line">docker image prune  # prune 命令用来删除不再使用的 docker 对象。删除所有未被 tag 标记和未被容器使用的镜像</span><br></pre></td></tr></table></figure>
-
-<h2 id="成果展示"><a href="#成果展示" class="headerlink" title="成果展示"></a>成果展示</h2><p><img src="https://picgo-1321316737.cos.ap-guangzhou.myqcloud.com/img/20240513144412.png"></p>
-]]></content>
-      <categories>
-        <category>docker</category>
-      </categories>
-      <tags>
-        <tag>docker</tag>
       </tags>
   </entry>
   <entry>
