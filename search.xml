@@ -204,6 +204,51 @@
       </tags>
   </entry>
   <entry>
+    <title>nginx proxy manager安装</title>
+    <url>/undefined/null/</url>
+    <content><![CDATA[<p>图示：<br><img src="https://picgo-1321316737.cos.ap-guangzhou.myqcloud.com/img/20240513145119.png"></p>
+<h2 id="1、主要特点："><a href="#1、主要特点：" class="headerlink" title="1、主要特点："></a>1、主要特点：</h2><ol>
+<li><strong>图形化界面</strong>：提供用户友好的Web界面，允许用户通过点选和表单填写的方式而非手动编辑Nginx配置文件来配置反向代理规则、上游服务器、重定向、SSL证书等，大大降低了配置Nginx的难度。</li>
+<li><strong>自动化SSL证书管理</strong>：无缝集成 Let’s Encrypt，支持一键申请、自动续期 SSL 证书，确保网站安全访问。</li>
+<li><strong>域名和路径基础的路由</strong>：用户可以基于不同的域名或路径设置反向代理规则，实现精细的流量控制。</li>
+<li><strong>Docker集成</strong>：Nginx Proxy Manager 本身设计为Docker镜像，易于部署和升级。通过Docker Compose，可以在几分钟内快速搭建起来，适用于从个人开发者到企业的各种场景。</li>
+<li><strong>多用户支持</strong>：可创建多个用户账户，分配不同的权限，适合团队协作。</li>
+<li><strong>灵活的日志记录</strong>：提供访问日志查看功能，便于监控和故障排查。</li>
+<li><strong>高级功能</strong>：支持WebSocket、HTTP&#x2F;2、ACME DNS验证等多种高级特性。</li>
+</ol>
+<h2 id="创建安装目录"><a href="#创建安装目录" class="headerlink" title="创建安装目录"></a>创建安装目录</h2><p>创建一下安装的目录：  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo -i  </span><br><span class="line">  </span><br><span class="line">mkdir -p /root/data/docker_data/npm  </span><br><span class="line">  </span><br><span class="line">cd /root/data/docker_data/npm  </span><br></pre></td></tr></table></figure>
+
+<p>这边我们直接用docker，参考这篇文章（ [[03、docker and docker compose]]）的方式安装。  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">vim docker-compose.yml </span><br><span class="line">```  </span><br><span class="line"> </span><br><span class="line">英文输入法下，按 i </span><br></pre></td></tr></table></figure>
+<p>version: ‘3’<br>services:<br>  app:<br>    image: ‘jc21&#x2F;nginx-proxy-manager:latest’<br>    restart: unless-stopped<br>    ports:<br>      - ‘80:80’  # 冒号左边可以改成自己服务器未被占用的端口<br>      - ‘81:81’  # 冒号左边可以改成自己服务器未被占用的端口<br>      - ‘443:443’ # 冒号左边可以改成自己服务器未被占用的端口<br>    volumes:<br>      - .&#x2F;data:&#x2F;data # 冒号左边可以改路径，现在是表示把数据存放在在当前文件夹下的 data 文件夹中<br>      - .&#x2F;letsencrypt:&#x2F;etc&#x2F;letsencrypt  # 冒号左边可以改路径，现在是表示把数据存放在在当前文件夹下的 letsencrypt 文件夹中  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">按一下 esc，然后 :wq 保存退出，之后，  </span><br><span class="line">  </span><br><span class="line">查看端口是否被占用（以 81 为例），输入：  </span><br><span class="line">  </span><br><span class="line">lsof -i:81  # 查看 81 端口是否被占用，如果被占用，重新自定义一个端口  </span><br><span class="line">如果啥也没出现，表示端口未被占用，我们可以继续下面的操作了～  </span><br><span class="line">  </span><br><span class="line">如果出现：  </span><br><span class="line">  </span><br><span class="line">-bash: lsof: command not found  </span><br><span class="line">运行：  </span><br><span class="line">  </span><br><span class="line">apt install lsof  # 安装 lsof  </span><br><span class="line">如果端口没有被占用（被占用了就修改一下端口，比如改成 82，注意 docker 命令行里和防火墙都要改）  </span><br><span class="line">  </span><br><span class="line">运行并访问 Nginx Proxy Manager  </span><br><span class="line">最后：  </span><br></pre></td></tr></table></figure>
+<p>cd &#x2F;root&#x2F;data&#x2F;docker_data&#x2F;npm   # 来到 dockercompose 文件所在的文件夹下  </p>
+<p>docker-compose up -d   </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">理论上我们就可以输入 http://ip:81 访问了。  </span><br><span class="line">  </span><br><span class="line">默认登陆名和密码：  </span><br><span class="line">  </span><br><span class="line">Email:    admin@example.com  </span><br><span class="line">Password: changeme  </span><br><span class="line"></span><br><span class="line">注意：  </span><br><span class="line">  </span><br><span class="line">1、不知道服务器 IP，可以直接在命令行输入：curl ip.sb，会显示当前服务器的 IP。  </span><br><span class="line">  </span><br><span class="line">2、遇到访问不了的情况，请再次检查在宝塔面板的防火墙和服务商的后台防火墙是否打开对应了端口。  </span><br><span class="line">  </span><br><span class="line">## 更新 Nginx Proxy Manager  </span><br></pre></td></tr></table></figure>
+<p>cd &#x2F;root&#x2F;data&#x2F;docker_data&#x2F;npm  </p>
+<p>docker-compose down   </p>
+<p>cp -r &#x2F;root&#x2F;data&#x2F;docker_data&#x2F;npm &#x2F;root&#x2F;data&#x2F;docker_data&#x2F;npm.archive  # 万事先备份，以防万一  </p>
+<p>docker-compose pull  </p>
+<p>docker-compose up -d      </p>
+<p>docker image prune  # prune 命令用来删除不再使用的 docker 对象。删除所有未被 tag 标记和未被容器使用的镜像  </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">提示：  </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">WARNING! This will remove all dangling images.  </span><br><span class="line">Are you sure you want to continue? [y/N]   </span><br><span class="line">输入 y  </span><br><span class="line">  </span><br><span class="line">利用 Docker 搭建的应用，更新非常容易</span><br><span class="line">  </span><br><span class="line">## 卸载 Nginx Proxy Manager  </span><br></pre></td></tr></table></figure>
+<p>cd &#x2F;root&#x2F;data&#x2F;docker_data&#x2F;npm  </p>
+<p>docker-compose down   </p>
+<p>rm -rf &#x2F;root&#x2F;data&#x2F;docker_data&#x2F;npm  # 完全删除映射到本地的数据  </p>
+<pre><code>
+可以卸载得很干净。
+</code></pre>
+]]></content>
+      <categories>
+        <category>dockers</category>
+      </categories>
+      <tags>
+        <tag>docker</tag>
+        <tag>npm</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>整理一些常用的脚本</title>
     <url>/undefined/91208508/</url>
     <content><![CDATA[<p>Halo 2.0是一款基于Spring Boot和Vue.js框架构建的现代化开源内容管理系统（CMS），专为个人博客及小型网站设计。作为一款开源软件，Halo不仅代码开放，而且完全免费，这意味着用户可以自由地查看、修改源代码以适应个性化需求，同时也能够享受到社区的支持和持续的更新。</p>
@@ -321,78 +366,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Wiki.js搭建</title>
-    <url>/undefined/6b5f11fd/</url>
-    <content><![CDATA[<p>&#x3D;&#x3D;转载，仅供个人学习！！！&#x3D;&#x3D;</p>
-<h2 id="1-介绍"><a href="#1-介绍" class="headerlink" title="1.介绍"></a>1.介绍</h2><p>Wiki.js是一个现代化、开源的wiki应用程序，它基于Node.js构建，旨在提供强大、美观且高度可定制的知识管理解决方案。以下是Wiki.js的一些主要特点，特别是在使用Docker进行部署时的优势：</p>
-<ol>
-<li><strong>容器化部署</strong>：通过Docker部署Wiki.js，你可以享受到快速、一致且跨平台的部署体验。Docker镜像确保了运行环境的一致性，无论是Linux、macOS还是Windows系统，都能轻松启动Wiki.js，无需担心底层环境差异带来的配置问题。</li>
-<li><strong>美观的界面</strong>：Wiki.js以其优雅且用户友好的界面著称，提供了出色的阅读和编辑体验。支持Markdown编辑，让文档编写既简单又高效。</li>
-<li><strong>强大的搜索引擎</strong>：内置的全文搜索引擎确保用户能够快速找到所需的信息，提升知识库的可用性。</li>
-<li><strong>多用户与权限管理</strong>：支持多用户登录和精细的权限控制系统，可以设置不同的访问权限给不同的用户或用户组，适合团队协作和知识共享。</li>
-<li><strong>插件与扩展性</strong>：Wiki.js具有高度的可扩展性，允许通过插件系统来增加额外功能，满足特定需求，比如支持LDAP认证、备份与恢复等。</li>
-<li><strong>外部数据库支持</strong>：虽然可以使用内置的数据库解决方案，但Wiki.js还支持连接到外部的PostgreSQL、MySQL、MariaDB或MongoDB等数据库，以适应不同的部署需求和规模。</li>
-<li><strong>Markdown与富文本编辑</strong>：兼容Markdown和富文本编辑器，适应不同用户的编辑习惯，同时保持文档的结构化和易于维护。</li>
-<li><strong>版本控制与修订历史</strong>：自动跟踪文档的所有更改，用户可以查看和回滚到之前的任何一个版本，确保知识的完整性和可追溯性。</li>
-<li><strong>易于安装与升级</strong>：使用Docker部署Wiki.js，只需简单的Docker命令即可完成安装和更新过程，降低了维护成本。</li>
-<li><strong>社区支持与活跃开发</strong>：作为一个开源项目，Wiki.js拥有活跃的开发者和用户社区，持续接收贡献，修复问题并推出新功能，确保软件的稳定性和创新性。</li>
-</ol>
-<h2 id="2-项目展示"><a href="#2-项目展示" class="headerlink" title="2. 项目展示"></a>2. 项目展示</h2><p>GitHub原项目地址：<a href="https://github.com/Requarks/wiki">https://github.com/Requarks/wiki</a></p>
-<p>官网地址：<a href="https://js.wiki/">https://js.wiki/</a></p>
-<p>官方文档地址：<a href="https://docs.requarks.io/">https://docs.requarks.io/</a></p>
-<p>本教程用的镜像：<a href="https://hub.docker.com/r/linuxserver/wikijs">https://hub.docker.com/r/linuxserver/wikijs</a></p>
-<p>Demo:<a href="https://docs.requarks.io/">https://docs.requarks.io/</a></p>
-<h2 id="3-搭建环境"><a href="#3-搭建环境" class="headerlink" title="3. 搭建环境"></a>3. 搭建环境</h2><p>系统：Debian 10（DD脚本 非必需DD用原来的系统也OK）</p>
-<p>域名一枚，并做好解析到服务器上</p>
-<p>安装好Docker、Docker-compose（相关脚本）</p>
-<p>安装好Nginx Proxy Manager（相关教程）</p>
-<h2 id="4-搭建方式"><a href="#4-搭建方式" class="headerlink" title="4. 搭建方式"></a>4. 搭建方式</h2><h3 id="4-1-搭建"><a href="#4-1-搭建" class="headerlink" title="4.1 搭建"></a>4.1 搭建</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo -i # 切换到root用户</span><br><span class="line"></span><br><span class="line">apt update -y # 升级packages</span><br><span class="line"></span><br><span class="line">	apt install wget curl sudo vim git # Debian系统比较干净，安装常用的软件</span><br></pre></td></tr></table></figure>
-
-<hr>
-<p>创建一下安装的目录：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mkdir -p /root/data/docker_data/wikijs</span><br><span class="line"></span><br><span class="line">cd /root/data/docker_data/wikijs</span><br><span class="line"></span><br><span class="line">vim docker-compose.yml</span><br></pre></td></tr></table></figure>
-
-<p>docker-compose.yml填入以下内容：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">version: &quot;2.1&quot;</span><br><span class="line">services:</span><br><span class="line">  wikijs:</span><br><span class="line">    image: lscr.io/linuxserver/wikijs</span><br><span class="line">    container_name: wikijs</span><br><span class="line">    environment:</span><br><span class="line">      - PUID=1000        # 如何查看当前用户的PUID和PGID，直接命令行输入id就行</span><br><span class="line">      - PGID=1000</span><br><span class="line">      - TZ=Asia/Shanghai</span><br><span class="line">    volumes:</span><br><span class="line">      - /root/data/docker_data/wikijs/config:/config  # 配置文件映射到本地，数据不会因为Docker停止而丢失</span><br><span class="line">      - /root/data/docker_data/wikijs/data:/data  # 数据映射到本地，数据不会因为Docker停止而丢失</span><br><span class="line">    ports:</span><br><span class="line">      - 8080:3000   # 左边的8080可以自己调整端口号，右边的3000不要改</span><br><span class="line">    restart: unless-stopped</span><br></pre></td></tr></table></figure>
-
-<hr>
-<p>没问题的话，ctrl+x退出，按y保存，enter确认。</p>
-<p>然后运行：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker-compose up -d</span><br></pre></td></tr></table></figure>
-
-<p>访问：&#x3D;&#x3D;http:服务ip:8080 即可。&#x3D;&#x3D;</p>
-<hr>
-<p>注意：</p>
-<p>1、不知道服务器IP，可以直接在命令行输入：curl <a href="http://ip.sb/">ip.sb</a>，会显示当前服务器的IP。</p>
-<p>2、遇到访问不了的情况，请在宝塔面板的防火墙和服务商的后台防火墙里打开对应端口。</p>
-<hr>
-<h3 id="4-2-更新"><a href="#4-2-更新" class="headerlink" title="4.2 更新"></a>4.2 更新</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cp -r /root/data/docker_data/wikijs /root/data/docker_data/wikijs.archive # 万事先备份，以防万一</span><br><span class="line"></span><br><span class="line">cd /root/data/docker_data/wikijs # 进入docker-compose所在的文件夹</span><br><span class="line"></span><br><span class="line">docker-compose pull # 拉取最新的镜像</span><br><span class="line"></span><br><span class="line">docker-compose up -d # 重新更新当前镜像</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-</blockquote>
-<p>利用Docker-compose搭建的应用，更新非常容易～</p>
-<hr>
-<h3 id="4-3-卸载"><a href="#4-3-卸载" class="headerlink" title="4.3 卸载"></a>4.3 卸载</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cd /root/data/docker_data/wikijs # 进入docker-compose所在的文件夹</span><br><span class="line"></span><br><span class="line">docker-compose down # 停止容器，此时不会删除映射到本地的数据</span><br><span class="line"></span><br><span class="line">rm -rf /root/data/docker_data/wikijs # 完全删除映射到本地的数据</span><br></pre></td></tr></table></figure>
-
-<p>此时，执行：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ls -al</span><br></pre></td></tr></table></figure>
-
-<p>可以看到三个文件夹，config、 data、 docker-compose.yml</p>
-<hr>
-<p>如果想要删除配置文件和数据，重新搭建的话，执行：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">rm -rf config/</span><br><span class="line"></span><br><span class="line">rm -rf data/</span><br></pre></td></tr></table></figure>
-
-<p>如果想要全部删除的话，执行：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cd .. # 退回到/root/data/docker_data目录</span><br><span class="line"></span><br><span class="line">rm -rf /root/data/docker_data/wikijs # 完全删除映射到本地的数据</span><br></pre></td></tr></table></figure>]]></content>
-      <categories>
-        <category>dockers</category>
-      </categories>
-      <tags>
-        <tag>docker</tag>
-        <tag>wikijs</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Typecho博客搭建</title>
     <url>/undefined/368776e6/</url>
     <content><![CDATA[<p>Typecho 是一款基于 PHP 和 MySQL 的开源博客程序，它以其轻量级、高效以及高度可定制性著称。尽管 Typecho 本身不是直接作为 Docker 应用发布，但社区中存在不少利用 Docker 容器技术来部署和管理 Typecho 的方案，这使得在各种环境中部署 Typecho 变得更加便捷和统一。以下是使用 Docker 部署 Typecho 时体现出的一些特点和优势：</p>
@@ -498,76 +471,75 @@
       </tags>
   </entry>
   <entry>
-    <title>nginx proxy manager安装</title>
-    <url>/undefined/null/</url>
-    <content><![CDATA[<p>图示：<br><img src="https://picgo-1321316737.cos.ap-guangzhou.myqcloud.com/img/20240513145119.png"></p>
-<h2 id="1、主要特点："><a href="#1、主要特点：" class="headerlink" title="1、主要特点："></a>1、主要特点：</h2><ol>
-<li><strong>图形化界面</strong>：提供用户友好的Web界面，允许用户通过点选和表单填写的方式而非手动编辑Nginx配置文件来配置反向代理规则、上游服务器、重定向、SSL证书等，大大降低了配置Nginx的难度。</li>
-<li><strong>自动化SSL证书管理</strong>：无缝集成 Let’s Encrypt，支持一键申请、自动续期 SSL 证书，确保网站安全访问。</li>
-<li><strong>域名和路径基础的路由</strong>：用户可以基于不同的域名或路径设置反向代理规则，实现精细的流量控制。</li>
-<li><strong>Docker集成</strong>：Nginx Proxy Manager 本身设计为Docker镜像，易于部署和升级。通过Docker Compose，可以在几分钟内快速搭建起来，适用于从个人开发者到企业的各种场景。</li>
-<li><strong>多用户支持</strong>：可创建多个用户账户，分配不同的权限，适合团队协作。</li>
-<li><strong>灵活的日志记录</strong>：提供访问日志查看功能，便于监控和故障排查。</li>
-<li><strong>高级功能</strong>：支持WebSocket、HTTP&#x2F;2、ACME DNS验证等多种高级特性。</li>
-</ol>
-<h2 id="创建安装目录"><a href="#创建安装目录" class="headerlink" title="创建安装目录"></a>创建安装目录</h2><p>创建一下安装的目录：  </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo -i  </span><br><span class="line">  </span><br><span class="line">mkdir -p /root/data/docker_data/npm  </span><br><span class="line">  </span><br><span class="line">cd /root/data/docker_data/npm  </span><br></pre></td></tr></table></figure>
-
-<p>这边我们直接用docker，参考这篇文章（ [[03、docker and docker compose]]）的方式安装。  </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">vim docker-compose.yml </span><br><span class="line">```  </span><br><span class="line"> </span><br><span class="line">英文输入法下，按 i </span><br></pre></td></tr></table></figure>
-<p>version: ‘3’<br>services:<br>  app:<br>    image: ‘jc21&#x2F;nginx-proxy-manager:latest’<br>    restart: unless-stopped<br>    ports:<br>      - ‘80:80’  # 冒号左边可以改成自己服务器未被占用的端口<br>      - ‘81:81’  # 冒号左边可以改成自己服务器未被占用的端口<br>      - ‘443:443’ # 冒号左边可以改成自己服务器未被占用的端口<br>    volumes:<br>      - .&#x2F;data:&#x2F;data # 冒号左边可以改路径，现在是表示把数据存放在在当前文件夹下的 data 文件夹中<br>      - .&#x2F;letsencrypt:&#x2F;etc&#x2F;letsencrypt  # 冒号左边可以改路径，现在是表示把数据存放在在当前文件夹下的 letsencrypt 文件夹中  </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">按一下 esc，然后 :wq 保存退出，之后，  </span><br><span class="line">  </span><br><span class="line">查看端口是否被占用（以 81 为例），输入：  </span><br><span class="line">  </span><br><span class="line">lsof -i:81  # 查看 81 端口是否被占用，如果被占用，重新自定义一个端口  </span><br><span class="line">如果啥也没出现，表示端口未被占用，我们可以继续下面的操作了～  </span><br><span class="line">  </span><br><span class="line">如果出现：  </span><br><span class="line">  </span><br><span class="line">-bash: lsof: command not found  </span><br><span class="line">运行：  </span><br><span class="line">  </span><br><span class="line">apt install lsof  # 安装 lsof  </span><br><span class="line">如果端口没有被占用（被占用了就修改一下端口，比如改成 82，注意 docker 命令行里和防火墙都要改）  </span><br><span class="line">  </span><br><span class="line">运行并访问 Nginx Proxy Manager  </span><br><span class="line">最后：  </span><br></pre></td></tr></table></figure>
-<p>cd &#x2F;root&#x2F;data&#x2F;docker_data&#x2F;npm   # 来到 dockercompose 文件所在的文件夹下  </p>
-<p>docker-compose up -d   </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">理论上我们就可以输入 http://ip:81 访问了。  </span><br><span class="line">  </span><br><span class="line">默认登陆名和密码：  </span><br><span class="line">  </span><br><span class="line">Email:    admin@example.com  </span><br><span class="line">Password: changeme  </span><br><span class="line"></span><br><span class="line">注意：  </span><br><span class="line">  </span><br><span class="line">1、不知道服务器 IP，可以直接在命令行输入：curl ip.sb，会显示当前服务器的 IP。  </span><br><span class="line">  </span><br><span class="line">2、遇到访问不了的情况，请再次检查在宝塔面板的防火墙和服务商的后台防火墙是否打开对应了端口。  </span><br><span class="line">  </span><br><span class="line">## 更新 Nginx Proxy Manager  </span><br></pre></td></tr></table></figure>
-<p>cd &#x2F;root&#x2F;data&#x2F;docker_data&#x2F;npm  </p>
-<p>docker-compose down   </p>
-<p>cp -r &#x2F;root&#x2F;data&#x2F;docker_data&#x2F;npm &#x2F;root&#x2F;data&#x2F;docker_data&#x2F;npm.archive  # 万事先备份，以防万一  </p>
-<p>docker-compose pull  </p>
-<p>docker-compose up -d      </p>
-<p>docker image prune  # prune 命令用来删除不再使用的 docker 对象。删除所有未被 tag 标记和未被容器使用的镜像  </p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">提示：  </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">WARNING! This will remove all dangling images.  </span><br><span class="line">Are you sure you want to continue? [y/N]   </span><br><span class="line">输入 y  </span><br><span class="line">  </span><br><span class="line">利用 Docker 搭建的应用，更新非常容易</span><br><span class="line">  </span><br><span class="line">## 卸载 Nginx Proxy Manager  </span><br></pre></td></tr></table></figure>
-<p>cd &#x2F;root&#x2F;data&#x2F;docker_data&#x2F;npm  </p>
-<p>docker-compose down   </p>
-<p>rm -rf &#x2F;root&#x2F;data&#x2F;docker_data&#x2F;npm  # 完全删除映射到本地的数据  </p>
-<pre><code>
-可以卸载得很干净。
-</code></pre>
-]]></content>
-      <categories>
-        <category>dockers</category>
-      </categories>
-      <tags>
-        <tag>docker</tag>
-        <tag>npm</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>nextcloud搭建</title>
-    <url>/undefined/8093261a/</url>
-    <content><![CDATA[<p>Nextcloud是一款开源的云存储和文件共享平台，通过Docker部署Nextcloud，其特点简述如下：</p>
+    <title>Wiki.js搭建</title>
+    <url>/undefined/6b5f11fd/</url>
+    <content><![CDATA[<p>&#x3D;&#x3D;转载，仅供个人学习！！！&#x3D;&#x3D;</p>
+<h2 id="1-介绍"><a href="#1-介绍" class="headerlink" title="1.介绍"></a>1.介绍</h2><p>Wiki.js是一个现代化、开源的wiki应用程序，它基于Node.js构建，旨在提供强大、美观且高度可定制的知识管理解决方案。以下是Wiki.js的一些主要特点，特别是在使用Docker进行部署时的优势：</p>
 <ol>
-<li><strong>快速部署与可移植性</strong>：Docker化使Nextcloud部署变得快捷简便，几条命令即可启动服务，同时确保跨环境一致性。</li>
-<li><strong>环境隔离与资源优化</strong>：容器化运行保证了Nextcloud运行环境的隔离性，易于资源管理和限制，提高系统安全性。</li>
-<li><strong>数据持久化</strong>：结合Docker卷，用户数据和配置可持久保存，确保升级或迁移时数据不丢失。</li>
-<li><strong>弹性扩展与集成</strong>：易于与其他Docker服务（如MySQL数据库）集成，支持通过Docker Compose搭建完整生态系统，按需扩展功能。</li>
-<li><strong>安全更新与维护</strong>：利用Docker镜像更新，轻松实现Nextcloud及其依赖的升级，保持系统最新且安全。</li>
-<li><strong>社区支持</strong>：得益于开源社区，Nextcloud在Docker上的应用拥有丰富的文档和用户支持，便于故障排查和定制化。</li>
+<li><strong>容器化部署</strong>：通过Docker部署Wiki.js，你可以享受到快速、一致且跨平台的部署体验。Docker镜像确保了运行环境的一致性，无论是Linux、macOS还是Windows系统，都能轻松启动Wiki.js，无需担心底层环境差异带来的配置问题。</li>
+<li><strong>美观的界面</strong>：Wiki.js以其优雅且用户友好的界面著称，提供了出色的阅读和编辑体验。支持Markdown编辑，让文档编写既简单又高效。</li>
+<li><strong>强大的搜索引擎</strong>：内置的全文搜索引擎确保用户能够快速找到所需的信息，提升知识库的可用性。</li>
+<li><strong>多用户与权限管理</strong>：支持多用户登录和精细的权限控制系统，可以设置不同的访问权限给不同的用户或用户组，适合团队协作和知识共享。</li>
+<li><strong>插件与扩展性</strong>：Wiki.js具有高度的可扩展性，允许通过插件系统来增加额外功能，满足特定需求，比如支持LDAP认证、备份与恢复等。</li>
+<li><strong>外部数据库支持</strong>：虽然可以使用内置的数据库解决方案，但Wiki.js还支持连接到外部的PostgreSQL、MySQL、MariaDB或MongoDB等数据库，以适应不同的部署需求和规模。</li>
+<li><strong>Markdown与富文本编辑</strong>：兼容Markdown和富文本编辑器，适应不同用户的编辑习惯，同时保持文档的结构化和易于维护。</li>
+<li><strong>版本控制与修订历史</strong>：自动跟踪文档的所有更改，用户可以查看和回滚到之前的任何一个版本，确保知识的完整性和可追溯性。</li>
+<li><strong>易于安装与升级</strong>：使用Docker部署Wiki.js，只需简单的Docker命令即可完成安装和更新过程，降低了维护成本。</li>
+<li><strong>社区支持与活跃开发</strong>：作为一个开源项目，Wiki.js拥有活跃的开发者和用户社区，持续接收贡献，修复问题并推出新功能，确保软件的稳定性和创新性。</li>
 </ol>
+<h2 id="2-项目展示"><a href="#2-项目展示" class="headerlink" title="2. 项目展示"></a>2. 项目展示</h2><p>GitHub原项目地址：<a href="https://github.com/Requarks/wiki">https://github.com/Requarks/wiki</a></p>
+<p>官网地址：<a href="https://js.wiki/">https://js.wiki/</a></p>
+<p>官方文档地址：<a href="https://docs.requarks.io/">https://docs.requarks.io/</a></p>
+<p>本教程用的镜像：<a href="https://hub.docker.com/r/linuxserver/wikijs">https://hub.docker.com/r/linuxserver/wikijs</a></p>
+<p>Demo:<a href="https://docs.requarks.io/">https://docs.requarks.io/</a></p>
+<h2 id="3-搭建环境"><a href="#3-搭建环境" class="headerlink" title="3. 搭建环境"></a>3. 搭建环境</h2><p>系统：Debian 10（DD脚本 非必需DD用原来的系统也OK）</p>
+<p>域名一枚，并做好解析到服务器上</p>
+<p>安装好Docker、Docker-compose（相关脚本）</p>
+<p>安装好Nginx Proxy Manager（相关教程）</p>
+<h2 id="4-搭建方式"><a href="#4-搭建方式" class="headerlink" title="4. 搭建方式"></a>4. 搭建方式</h2><h3 id="4-1-搭建"><a href="#4-1-搭建" class="headerlink" title="4.1 搭建"></a>4.1 搭建</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo -i # 切换到root用户</span><br><span class="line"></span><br><span class="line">apt update -y # 升级packages</span><br><span class="line"></span><br><span class="line">	apt install wget curl sudo vim git # Debian系统比较干净，安装常用的软件</span><br></pre></td></tr></table></figure>
+
+<hr>
 <p>创建一下安装的目录：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo -i</span><br><span class="line"></span><br><span class="line"><span class="built_in">mkdir</span> -p /root/data/aio-nextcloud</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> /root/data/aio-nextcloud</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">vim docker-compose.yml</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mkdir -p /root/data/docker_data/wikijs</span><br><span class="line"></span><br><span class="line">cd /root/data/docker_data/wikijs</span><br><span class="line"></span><br><span class="line">vim docker-compose.yml</span><br></pre></td></tr></table></figure>
 
-<p>以下是咕咕修改的，可以看看有啥不一样（具体见视频）</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">version: &quot;3.8&quot;</span><br><span class="line"></span><br><span class="line">volumes:</span><br><span class="line"> nextcloud_aio_mastercontainer:</span><br><span class="line">   name: nextcloud_aio_mastercontainer</span><br><span class="line">services:</span><br><span class="line"> nextcloud:</span><br><span class="line">   image: nextcloud/all-in-one:latest</span><br><span class="line">   restart: unless-stopped</span><br><span class="line">   container_name: nextcloud-aio-mastercontainer</span><br><span class="line">   volumes:</span><br><span class="line">     - nextcloud_aio_mastercontainer:/mnt/docker-aio-config</span><br><span class="line">     - /var/run/docker.sock:/var/run/docker.sock:ro</span><br><span class="line">   ports:</span><br><span class="line">     - 7070:8080 # change the port on the left side if it&#x27;s already in use on your host system.</span><br><span class="line">   environment:</span><br><span class="line">     - APACHE_PORT=11000  # change this port number if 11000 is already in use on your host system.</span><br><span class="line">     - APACHE_DISABLE_REWRITE_IP=1</span><br><span class="line">     - NEXTCLOUD_TRUSTED_DOMAINS=pan.gugu.ovh 31.22.109.18 # Your domain name + proxy host IP</span><br><span class="line">     - TRUSTED_PROXIES=31.22.109.18 # proxy host IP</span><br></pre></td></tr></table></figure>
+<p>docker-compose.yml填入以下内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">version: &quot;2.1&quot;</span><br><span class="line">services:</span><br><span class="line">  wikijs:</span><br><span class="line">    image: lscr.io/linuxserver/wikijs</span><br><span class="line">    container_name: wikijs</span><br><span class="line">    environment:</span><br><span class="line">      - PUID=1000        # 如何查看当前用户的PUID和PGID，直接命令行输入id就行</span><br><span class="line">      - PGID=1000</span><br><span class="line">      - TZ=Asia/Shanghai</span><br><span class="line">    volumes:</span><br><span class="line">      - /root/data/docker_data/wikijs/config:/config  # 配置文件映射到本地，数据不会因为Docker停止而丢失</span><br><span class="line">      - /root/data/docker_data/wikijs/data:/data  # 数据映射到本地，数据不会因为Docker停止而丢失</span><br><span class="line">    ports:</span><br><span class="line">      - 8080:3000   # 左边的8080可以自己调整端口号，右边的3000不要改</span><br><span class="line">    restart: unless-stopped</span><br></pre></td></tr></table></figure>
 
-]]></content>
+<hr>
+<p>没问题的话，ctrl+x退出，按y保存，enter确认。</p>
+<p>然后运行：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker-compose up -d</span><br></pre></td></tr></table></figure>
+
+<p>访问：&#x3D;&#x3D;http:服务ip:8080 即可。&#x3D;&#x3D;</p>
+<hr>
+<p>注意：</p>
+<p>1、不知道服务器IP，可以直接在命令行输入：curl <a href="http://ip.sb/">ip.sb</a>，会显示当前服务器的IP。</p>
+<p>2、遇到访问不了的情况，请在宝塔面板的防火墙和服务商的后台防火墙里打开对应端口。</p>
+<hr>
+<h3 id="4-2-更新"><a href="#4-2-更新" class="headerlink" title="4.2 更新"></a>4.2 更新</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cp -r /root/data/docker_data/wikijs /root/data/docker_data/wikijs.archive # 万事先备份，以防万一</span><br><span class="line"></span><br><span class="line">cd /root/data/docker_data/wikijs # 进入docker-compose所在的文件夹</span><br><span class="line"></span><br><span class="line">docker-compose pull # 拉取最新的镜像</span><br><span class="line"></span><br><span class="line">docker-compose up -d # 重新更新当前镜像</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+</blockquote>
+<p>利用Docker-compose搭建的应用，更新非常容易～</p>
+<hr>
+<h3 id="4-3-卸载"><a href="#4-3-卸载" class="headerlink" title="4.3 卸载"></a>4.3 卸载</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cd /root/data/docker_data/wikijs # 进入docker-compose所在的文件夹</span><br><span class="line"></span><br><span class="line">docker-compose down # 停止容器，此时不会删除映射到本地的数据</span><br><span class="line"></span><br><span class="line">rm -rf /root/data/docker_data/wikijs # 完全删除映射到本地的数据</span><br></pre></td></tr></table></figure>
+
+<p>此时，执行：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">ls -al</span><br></pre></td></tr></table></figure>
+
+<p>可以看到三个文件夹，config、 data、 docker-compose.yml</p>
+<hr>
+<p>如果想要删除配置文件和数据，重新搭建的话，执行：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">rm -rf config/</span><br><span class="line"></span><br><span class="line">rm -rf data/</span><br></pre></td></tr></table></figure>
+
+<p>如果想要全部删除的话，执行：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cd .. # 退回到/root/data/docker_data目录</span><br><span class="line"></span><br><span class="line">rm -rf /root/data/docker_data/wikijs # 完全删除映射到本地的数据</span><br></pre></td></tr></table></figure>]]></content>
       <categories>
         <category>dockers</category>
       </categories>
       <tags>
         <tag>docker</tag>
-        <tag>cloud storage</tag>
+        <tag>wikijs</tag>
       </tags>
   </entry>
   <entry>
@@ -601,6 +573,34 @@
       <tags>
         <tag>docker</tag>
         <tag>website</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>nextcloud搭建</title>
+    <url>/undefined/8093261a/</url>
+    <content><![CDATA[<p>Nextcloud是一款开源的云存储和文件共享平台，通过Docker部署Nextcloud，其特点简述如下：</p>
+<ol>
+<li><strong>快速部署与可移植性</strong>：Docker化使Nextcloud部署变得快捷简便，几条命令即可启动服务，同时确保跨环境一致性。</li>
+<li><strong>环境隔离与资源优化</strong>：容器化运行保证了Nextcloud运行环境的隔离性，易于资源管理和限制，提高系统安全性。</li>
+<li><strong>数据持久化</strong>：结合Docker卷，用户数据和配置可持久保存，确保升级或迁移时数据不丢失。</li>
+<li><strong>弹性扩展与集成</strong>：易于与其他Docker服务（如MySQL数据库）集成，支持通过Docker Compose搭建完整生态系统，按需扩展功能。</li>
+<li><strong>安全更新与维护</strong>：利用Docker镜像更新，轻松实现Nextcloud及其依赖的升级，保持系统最新且安全。</li>
+<li><strong>社区支持</strong>：得益于开源社区，Nextcloud在Docker上的应用拥有丰富的文档和用户支持，便于故障排查和定制化。</li>
+</ol>
+<p>创建一下安装的目录：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo -i</span><br><span class="line"></span><br><span class="line"><span class="built_in">mkdir</span> -p /root/data/aio-nextcloud</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> /root/data/aio-nextcloud</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">vim docker-compose.yml</span><br></pre></td></tr></table></figure>
+
+<p>以下是咕咕修改的，可以看看有啥不一样（具体见视频）</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">version: &quot;3.8&quot;</span><br><span class="line"></span><br><span class="line">volumes:</span><br><span class="line"> nextcloud_aio_mastercontainer:</span><br><span class="line">   name: nextcloud_aio_mastercontainer</span><br><span class="line">services:</span><br><span class="line"> nextcloud:</span><br><span class="line">   image: nextcloud/all-in-one:latest</span><br><span class="line">   restart: unless-stopped</span><br><span class="line">   container_name: nextcloud-aio-mastercontainer</span><br><span class="line">   volumes:</span><br><span class="line">     - nextcloud_aio_mastercontainer:/mnt/docker-aio-config</span><br><span class="line">     - /var/run/docker.sock:/var/run/docker.sock:ro</span><br><span class="line">   ports:</span><br><span class="line">     - 7070:8080 # change the port on the left side if it&#x27;s already in use on your host system.</span><br><span class="line">   environment:</span><br><span class="line">     - APACHE_PORT=11000  # change this port number if 11000 is already in use on your host system.</span><br><span class="line">     - APACHE_DISABLE_REWRITE_IP=1</span><br><span class="line">     - NEXTCLOUD_TRUSTED_DOMAINS=pan.gugu.ovh 31.22.109.18 # Your domain name + proxy host IP</span><br><span class="line">     - TRUSTED_PROXIES=31.22.109.18 # proxy host IP</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>dockers</category>
+      </categories>
+      <tags>
+        <tag>docker</tag>
+        <tag>cloud storage</tag>
       </tags>
   </entry>
   <entry>
@@ -676,6 +676,35 @@
       </tags>
   </entry>
   <entry>
+    <title>uptime 网站监控搭建</title>
+    <url>/undefined/2023caab/</url>
+    <content><![CDATA[<p>Uptime Kuma是一款开源的监控工具，通过Docker部署时，其特点包括：</p>
+<ol>
+<li><strong>快速部署与维护简便</strong>：Docker化部署，快捷启动，易于维护和升级。</li>
+<li><strong>站点健康监控</strong>：定期检查网站、服务可用性，支持HTTP(s)、TCP、ICMP等多种协议。</li>
+<li><strong>告警通知</strong>：可配置告警，通过邮件、Telegram等渠道发送服务中断通知。</li>
+<li><strong>自定义检查</strong>：支持根据需求配置自定义检查规则，如特定端口、内容监测。</li>
+<li><strong>数据私密与安全</strong>：自托管保证数据私密，且支持多语言界面。</li>
+<li><strong>容器化优势</strong>：环境一致性保障，资源高效利用，易于扩展与集成其他Docker服务。</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mkdir -p /root/data/docker_data/uptime </span><br><span class="line">cd /root/data/docker_data/uptime </span><br><span class="line">nano docker-compose.yml</span><br></pre></td></tr></table></figure>
+
+
+<p>docker-compose.yml填入以下内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">version: &#x27;3.3&#x27;</span><br><span class="line"></span><br><span class="line">services:</span><br><span class="line">  uptime-kuma:</span><br><span class="line">    image: louislam/uptime-kuma</span><br><span class="line">    container_name: uptime-kuma</span><br><span class="line">    volumes:</span><br><span class="line">      - ./uptime-kuma:/app/data</span><br><span class="line">    ports:</span><br><span class="line">      - 3001:3001     # 左边的3001可以自己调整端口号，右边的3000不要改</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker-compose up -d</span><br></pre></td></tr></table></figure>
+<p><img src="https://picgo-1321316737.cos.ap-guangzhou.myqcloud.com/img/20240513144714.png"></p>
+]]></content>
+      <categories>
+        <category>dockers</category>
+      </categories>
+      <tags>
+        <tag>docker</tag>
+        <tag>监控</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>网站流量统计工具 -Plausible</title>
     <url>/undefined/a0a38a3f/</url>
     <content><![CDATA[<p>Plausible是一款轻量级、开源的网页分析工具，通过Docker部署时，其核心特点包括：</p>
@@ -708,35 +737,6 @@
 
 
 
-]]></content>
-      <categories>
-        <category>dockers</category>
-      </categories>
-      <tags>
-        <tag>docker</tag>
-        <tag>监控</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>uptime 网站监控搭建</title>
-    <url>/undefined/2023caab/</url>
-    <content><![CDATA[<p>Uptime Kuma是一款开源的监控工具，通过Docker部署时，其特点包括：</p>
-<ol>
-<li><strong>快速部署与维护简便</strong>：Docker化部署，快捷启动，易于维护和升级。</li>
-<li><strong>站点健康监控</strong>：定期检查网站、服务可用性，支持HTTP(s)、TCP、ICMP等多种协议。</li>
-<li><strong>告警通知</strong>：可配置告警，通过邮件、Telegram等渠道发送服务中断通知。</li>
-<li><strong>自定义检查</strong>：支持根据需求配置自定义检查规则，如特定端口、内容监测。</li>
-<li><strong>数据私密与安全</strong>：自托管保证数据私密，且支持多语言界面。</li>
-<li><strong>容器化优势</strong>：环境一致性保障，资源高效利用，易于扩展与集成其他Docker服务。</li>
-</ol>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mkdir -p /root/data/docker_data/uptime </span><br><span class="line">cd /root/data/docker_data/uptime </span><br><span class="line">nano docker-compose.yml</span><br></pre></td></tr></table></figure>
-
-
-<p>docker-compose.yml填入以下内容：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">version: &#x27;3.3&#x27;</span><br><span class="line"></span><br><span class="line">services:</span><br><span class="line">  uptime-kuma:</span><br><span class="line">    image: louislam/uptime-kuma</span><br><span class="line">    container_name: uptime-kuma</span><br><span class="line">    volumes:</span><br><span class="line">      - ./uptime-kuma:/app/data</span><br><span class="line">    ports:</span><br><span class="line">      - 3001:3001     # 左边的3001可以自己调整端口号，右边的3000不要改</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker-compose up -d</span><br></pre></td></tr></table></figure>
-<p><img src="https://picgo-1321316737.cos.ap-guangzhou.myqcloud.com/img/20240513144714.png"></p>
 ]]></content>
       <categories>
         <category>dockers</category>
@@ -1146,6 +1146,36 @@
       </tags>
   </entry>
   <entry>
+    <title>在线工具——it-tools</title>
+    <url>/undefined/565989/</url>
+    <content><![CDATA[<p>IT-Tools是一个广受好评的开源Docker应用，专为IT专业人士设计，集成了多种实用的在线工具，极大地提升了日常工作的效率。以下是关于IT-Tools的详细介绍：</p>
+<h2 id="主要特点："><a href="#主要特点：" class="headerlink" title="主要特点："></a>主要特点：</h2><ul>
+<li><strong>集成工具箱</strong>：包含多种实用功能，如二维码生成、数据格式转换（如JSON、XML、YAML等）、MAC地址生成、加密解密（包括Token生成、UUID生成）、以及“Docker run转Docker Compose”等功能，满足开发者和IT运维人员的多样化需求。</li>
+<li><strong>易部署性</strong>：通过Docker容器化部署，使得设置和运行变得极其简单快捷，无论是在本地服务器、云端还是诸如NAS设备上都能轻松部署。</li>
+<li><strong>持续更新与维护</strong>：作为一个活跃的开源项目，IT-Tools在GitHub上获得了较高的关注度（例如，有4.7K星），意味着它得到了社区的支持，持续接收新功能和漏洞修复。</li>
+<li><strong>用户友好的界面</strong>：提供了直观的Web界面，使得操作这些工具变得更加便捷，无需复杂的命令行操作，即便是非技术背景的用户也能快速上手。</li>
+</ul>
+<h2 id="创建目录"><a href="#创建目录" class="headerlink" title="创建目录"></a>创建目录</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mkdir -p /root/data/docker_data/it-tools  </span><br><span class="line"></span><br><span class="line">cd /root/data/docker_data/it-tools</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">vim docker-compose.yml</span><br></pre></td></tr></table></figure>
+
+<h2 id="docker-compose-yml文件"><a href="#docker-compose-yml文件" class="headerlink" title="docker-compose.yml文件"></a>docker-compose.yml文件</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">version: &#x27;3.3&#x27;  </span><br><span class="line">services:  </span><br><span class="line">    it-tools:  </span><br><span class="line">        container_name: it-tools  </span><br><span class="line">        restart: unless-stopped  </span><br><span class="line">        ports:  </span><br><span class="line">            - &#x27;8330:80&#x27;  #8380可以修改成服务器上未使用过的其他端口  </span><br><span class="line">        image: &#x27;corentinth/it-tools:latest&#x27;</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker-compose up -d</span><br></pre></td></tr></table></figure>
+
+<h2 id="更新"><a href="#更新" class="headerlink" title="更新"></a>更新</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cd /root/data/docker_data/it-tools  </span><br><span class="line">  </span><br><span class="line">docker-compose pull  </span><br><span class="line">  </span><br><span class="line">docker-compose up -d    # 请不要使用 docker-compose stop 来停止容器，因为这么做需要额外的时间等待容器停止；docker-compose up -d 直接升级容器时会自动停止并立刻重建新的容器，完全没有必要浪费那些时间。  </span><br><span class="line">  </span><br><span class="line">docker image prune  # prune 命令用来删除不再使用的 docker 对象。删除所有未被 tag 标记和未被容器使用的镜像</span><br></pre></td></tr></table></figure>
+
+<h2 id="成果展示"><a href="#成果展示" class="headerlink" title="成果展示"></a>成果展示</h2><p><img src="https://picgo-1321316737.cos.ap-guangzhou.myqcloud.com/img/20240513144412.png"></p>
+]]></content>
+      <categories>
+        <category>docker</category>
+      </categories>
+      <tags>
+        <tag>docker</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>图床——picsur</title>
     <url>/undefined/8972656/</url>
     <content><![CDATA[<p>Picsur 是一个基于 Docker 部署的自托管图像共享服务。其主要特点包括：</p>
@@ -1176,36 +1206,6 @@
       <tags>
         <tag>docker</tag>
         <tag>图床</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>在线工具——it-tools</title>
-    <url>/undefined/565989/</url>
-    <content><![CDATA[<p>IT-Tools是一个广受好评的开源Docker应用，专为IT专业人士设计，集成了多种实用的在线工具，极大地提升了日常工作的效率。以下是关于IT-Tools的详细介绍：</p>
-<h2 id="主要特点："><a href="#主要特点：" class="headerlink" title="主要特点："></a>主要特点：</h2><ul>
-<li><strong>集成工具箱</strong>：包含多种实用功能，如二维码生成、数据格式转换（如JSON、XML、YAML等）、MAC地址生成、加密解密（包括Token生成、UUID生成）、以及“Docker run转Docker Compose”等功能，满足开发者和IT运维人员的多样化需求。</li>
-<li><strong>易部署性</strong>：通过Docker容器化部署，使得设置和运行变得极其简单快捷，无论是在本地服务器、云端还是诸如NAS设备上都能轻松部署。</li>
-<li><strong>持续更新与维护</strong>：作为一个活跃的开源项目，IT-Tools在GitHub上获得了较高的关注度（例如，有4.7K星），意味着它得到了社区的支持，持续接收新功能和漏洞修复。</li>
-<li><strong>用户友好的界面</strong>：提供了直观的Web界面，使得操作这些工具变得更加便捷，无需复杂的命令行操作，即便是非技术背景的用户也能快速上手。</li>
-</ul>
-<h2 id="创建目录"><a href="#创建目录" class="headerlink" title="创建目录"></a>创建目录</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">mkdir -p /root/data/docker_data/it-tools  </span><br><span class="line"></span><br><span class="line">cd /root/data/docker_data/it-tools</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">vim docker-compose.yml</span><br></pre></td></tr></table></figure>
-
-<h2 id="docker-compose-yml文件"><a href="#docker-compose-yml文件" class="headerlink" title="docker-compose.yml文件"></a>docker-compose.yml文件</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">version: &#x27;3.3&#x27;  </span><br><span class="line">services:  </span><br><span class="line">    it-tools:  </span><br><span class="line">        container_name: it-tools  </span><br><span class="line">        restart: unless-stopped  </span><br><span class="line">        ports:  </span><br><span class="line">            - &#x27;8330:80&#x27;  #8380可以修改成服务器上未使用过的其他端口  </span><br><span class="line">        image: &#x27;corentinth/it-tools:latest&#x27;</span><br></pre></td></tr></table></figure>
-
-
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">docker-compose up -d</span><br></pre></td></tr></table></figure>
-
-<h2 id="更新"><a href="#更新" class="headerlink" title="更新"></a>更新</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cd /root/data/docker_data/it-tools  </span><br><span class="line">  </span><br><span class="line">docker-compose pull  </span><br><span class="line">  </span><br><span class="line">docker-compose up -d    # 请不要使用 docker-compose stop 来停止容器，因为这么做需要额外的时间等待容器停止；docker-compose up -d 直接升级容器时会自动停止并立刻重建新的容器，完全没有必要浪费那些时间。  </span><br><span class="line">  </span><br><span class="line">docker image prune  # prune 命令用来删除不再使用的 docker 对象。删除所有未被 tag 标记和未被容器使用的镜像</span><br></pre></td></tr></table></figure>
-
-<h2 id="成果展示"><a href="#成果展示" class="headerlink" title="成果展示"></a>成果展示</h2><p><img src="https://picgo-1321316737.cos.ap-guangzhou.myqcloud.com/img/20240513144412.png"></p>
-]]></content>
-      <categories>
-        <category>docker</category>
-      </categories>
-      <tags>
-        <tag>docker</tag>
       </tags>
   </entry>
 </search>
